@@ -175,42 +175,45 @@ function App() {
 
       {status === "setup" && (
         <div className="setup">
-          <Logo />
-          <div className="axes-names">
-            <div>
-              <label htmlFor="xAxis">X-axis</label>
-              <input type="text" name="xAxis" id="xAxis" defaultValue="Effort" ref={xAxisRef} />
+          <div className="settings">
+            <Logo />
+            <div className="axes-names">
+              <div>
+                <label htmlFor="xAxis">X-axis</label>
+                <input type="text" name="xAxis" id="xAxis" defaultValue="Effort" ref={xAxisRef} />
+              </div>
+              <div>
+                <label htmlFor="yAxis">Y-axis</label>
+                <input type="text" name="yAxis" id="yAxis" defaultValue="Impact" ref={yAxisRef} />
+              </div>
             </div>
-            <div>
-              <label htmlFor="yAxis">Y-axis</label>
-              <input type="text" name="yAxis" id="yAxis" defaultValue="Impact" ref={yAxisRef} />
-            </div>
+            <p>Participants will see items in <br />randomized order.</p>
+            <div style={{ height: '12px' }}></div>
+            <button
+              className="secondary full-width"
+              onClick={() => { parent?.postMessage?.({ pluginMessage: JSON.stringify({ msgType: 'importSelectedIdeas' }) }, '*') }}>
+              Add selected stickies to prioritize
+            </button>
+            <div style={{ height: '12px' }}></div>
+            <button className={`full-width ${ideas.length === 0 ? 'disabled' : ''}`} onClick={startVoting}>Start voting</button>
           </div>
-          <p>Participants will see items in randomized order.</p>
-          <div style={{ height: '4px' }}></div>
-          <button
-            className="secondary"
-            onClick={() => { parent?.postMessage?.({ pluginMessage: JSON.stringify({ msgType: 'importSelectedIdeas' }) }, '*') }}>
-            Add selected stickies to prioritize
-          </button>
 
-          {ideas.length > 0 && <>
-            <div className="ideas-list">
-              <p>Items to vote on:</p>
-              <ul>
-                {ideas.map((idea, i) => <li key={idea}>
-                  {idea}
-                  <div
-                    className="delete-icon"
-                    onClick={() => removeIdeaAt(i)}
-                  ><IconX />
-                  </div>
-                </li>)}
-              </ul>
-            </div>
-            <button className={`big ${ideas.length === 0 ? 'disabled' : ''}`} onClick={startVoting}>Start voting</button>
-          </>
-          }
+
+          {/* {ideas.length > 0 && <> */}
+          <div className="ideas-list">
+            <p>Items to vote on:</p>
+            <ul>
+              {ideas.map((idea, i) => <li key={idea}>
+                {idea}
+                <div
+                  className="delete-icon"
+                  onClick={() => removeIdeaAt(i)}
+                ><IconX />
+                </div>
+              </li>)}
+            </ul>
+          </div>
+          {/* </>} */}
 
         </div>
       )}

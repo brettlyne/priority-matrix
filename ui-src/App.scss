@@ -1,5 +1,5 @@
 .App {
-  padding: 0 40px;
+  // padding: 0 40px;
   height: 100%;
 }
 
@@ -24,6 +24,10 @@ button {
 button.big {
   height: 40px;
   font-size: 18px;
+}
+button.full-width {
+  padding: 0;
+  width: 100%;
 }
 button.secondary {
   font-weight: 400;
@@ -58,15 +62,17 @@ button.secondary {
 button.disabled {
   cursor: default;
   pointer-events: none;
-  color: rgba(255, 255, 255, 0.6);
-  * {
-    opacity: 0.6;
-  }
+  // color: rgba(255, 255, 255, 0.6);
+  color: #ffffffbf;
+  background: #10808036;
+  // * {
+  //   opacity: 0.6;
+  // }
 }
 
 .setup {
-  padding-top: 40px;
-  padding-bottom: 40px;
+  display: flex;
+  height: 100%;
   p,
   label {
     color: #909e9e;
@@ -74,41 +80,49 @@ button.disabled {
   label {
     display: block;
   }
-  .logo {
-    margin-bottom: 32px;
-  }
-  .axes-names {
-    display: flex;
-  }
-  input {
-    width: 200px;
-    height: 36px;
-    color: #4a5656;
-    background: #f8f8f8;
-    border: 1px solid #a5a5a5;
-    border-radius: 6px;
-    margin-right: 20px;
-    font-size: 16px;
-    margin-bottom: 40px;
+  .settings {
+    padding: 40px;
+    flex: 1;
+    .logo {
+      margin-bottom: 32px;
+    }
+    .axes-names {
+      display: flex;
+      justify-content: space-between;
+    }
+    input {
+      width: 150px;
+      height: 36px;
+      color: #4a5656;
+      background: #f8f8f8;
+      border: 1px solid #a5a5a5;
+      border-radius: 6px;
+      font-size: 16px;
+      margin-bottom: 32px;
+      padding: 0 8px;
+    }
   }
   .ideas-list {
-    margin-top: 40px;
-    margin-bottom: 20px;
+    width: 248px;
+    padding: 12px;
+    background-color: #f5f5f5;
+    border-left: 1px solid #e3e1e1;
+    overflow: scroll;
     p {
       margin-bottom: 8px;
     }
     ul {
-      list-style: disc;
+      list-style: none;
     }
     li {
-      line-height: 22px;
       padding: 3px;
-      padding-left: 40px;
-      padding-right: 72px;
-      margin-left: -40px;
-      margin-right: -40px;
+      padding-left: 12px;
+      padding-right: 20px;
+      margin-left: -12px;
+      margin-right: -12px;
       position: relative;
       font-size: 14px;
+      line-height: 18px;
       .delete-icon {
         opacity: 0;
         transition: none;
@@ -119,12 +133,11 @@ button.disabled {
         cursor: pointer;
         padding-right: 8px;
         padding-left: 8px;
-        margin-right: 32px;
         justify-content: center;
         align-items: center;
       }
       &:hover {
-        background-color: #f3f3f3;
+        background-color: #fbfbfb;
         transition: background 0.1s;
         .delete-icon {
           transition: all 0.2s;
@@ -166,7 +179,7 @@ button.disabled {
   justify-content: space-between;
   flex-direction: column;
   height: 100%;
-  padding-top: 40px;
+  padding: 40px;
   padding-bottom: 80px;
 }
 .idea-text {
