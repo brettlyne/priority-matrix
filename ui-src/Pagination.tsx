@@ -37,7 +37,7 @@ const Pagination = ({ pages, height, currentPage, setCurrentPage, showDoneButton
         style={{ height: `${height * pages.length}px`, transform: `translateY(${-currentPage * height}px)` }}
       >
         {pages.map((page, i) => (
-          <div style={{ height: `${height}px` }}>
+          <div key={i} style={{ height: `${height}px` }}>
             {page}
           </div>
         ))}
