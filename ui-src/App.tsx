@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { Fragment, useEffect } from 'react'
 import Pagination from './Pagination'
 
 import './App.scss'
@@ -39,7 +39,7 @@ const LikertPage = ({ idea, ideaIndex, xAxis, yAxis, xRating, yRating, handleXRa
     <div>
       <p className="likert-heading">{xAxis}</p>
       <div className="likert">
-        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => <>
+        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => <Fragment key={`impact${ideaIndex}-${n}-x`}>
           <input
             type="radio"
             onChange={e => { handleXRating(parseInt(e.target.value)) }}
@@ -49,7 +49,7 @@ const LikertPage = ({ idea, ideaIndex, xAxis, yAxis, xRating, yRating, handleXRa
             checked={n === xRating}
           />
           <label htmlFor={`impact${ideaIndex}-${n}-x`}>{n}</label>
-        </>
+        </Fragment>
         )}
       </div>
 
@@ -57,7 +57,8 @@ const LikertPage = ({ idea, ideaIndex, xAxis, yAxis, xRating, yRating, handleXRa
 
       <p className="likert-heading">{yAxis}</p>
       <div className="likert">
-        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => <>
+
+        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => <Fragment key={`impact${ideaIndex}-${n}-y`}>
           <input
             type="radio"
             onChange={e => { handleYRating(parseInt(e.target.value)) }}
@@ -67,7 +68,7 @@ const LikertPage = ({ idea, ideaIndex, xAxis, yAxis, xRating, yRating, handleXRa
             checked={n === yRating}
           />
           <label htmlFor={`impact${ideaIndex}-${n}-y`}>{n}</label>
-        </>
+        </Fragment>
         )}
       </div>
     </div>
@@ -197,7 +198,7 @@ function App() {
             <div className="ideas-list">
               <p>Items to vote on:</p>
               <ul>
-                {ideas.map((idea, i) => <li>
+                {ideas.map((idea, i) => <li key={idea}>
                   {idea}
                   <div
                     className="delete-icon"
@@ -235,6 +236,7 @@ function App() {
           setCurrentPage={setCurrentPage}
           pages={userResponses.responses.map((response: object, i: number) => (
             <LikertPage
+              key={i}
               idea={ideas[response.questionIdx]}
               ideaIndex={i}
               xAxis={xAxis}
