@@ -1,6 +1,27 @@
 const { widget } = figma
 const { AutoLayout, Frame, Text, SVG, Rectangle, useSyncedState, useEffect, Ellipse } = widget
 
+// UTILITY FUNCTIONS
+const average = (array) => array.reduce((a, b) => a + b) / array.length;
+// NUMBER TO LETTER
+// https://github.com/MatthewMueller/number-to-letter
+const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const base = alphabet.length;
+const numToLetter = (n) => {
+  var digits = [];
+  do {
+    var v = n % base;
+    digits.push(v);
+    n = Math.floor(n / base);
+  } while (n-- > 0);
+  var chars = [];
+  while (digits.length) {
+    chars.push(alphabet[digits.pop()]);
+  }
+  return chars.join('');
+};
+
+
 function Widget() {
   const [responsesByUser, setResponsesByUser] = useSyncedState('responsesByUser', [])
   const [xAxisLabel, setXAxisLabel] = useSyncedState('xAxisLabel', 'Effort')
@@ -87,6 +108,9 @@ function Widget() {
         if (match.xRating !== null) { xRatings.push(match.xRating) }
         if (match.yRating !== null) { yRatings.push(match.yRating) }
       });
+      if (xRatings.length === 0 || yRatings.length === 0) {
+        continue;
+      }
       const avgX = average(xRatings)
       const avgY = average(yRatings)
       const letter = numToLetter(i)
@@ -282,7 +306,7 @@ function Widget() {
           return <AutoLayout
             height={'hug-contents'}
             width={'fill-parent'}
-            spacing={8}
+            spacing={10}
           >
             <Text fontSize={16} width={20} horizontalAlignText='right' lineHeight={20} fill='#108080' fontWeight={500}>
               {numToLetter(i)}
@@ -301,22 +325,4 @@ function Widget() {
 widget.register(Widget)
 
 
-// Number to letter utility
-// https://github.com/MatthewMueller/number-to-letter
-const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-const base = alphabet.length;
-const numToLetter = (n) => {
-  var digits = [];
-  do {
-    var v = n % base;
-    digits.push(v);
-    n = Math.floor(n / base);
-  } while (n-- > 0);
-  var chars = [];
-  while (digits.length) {
-    chars.push(alphabet[digits.pop()]);
-  }
-  return chars.join('');
-};
 
-const average = (array) => array.reduce((a, b) => a + b) / array.length;
