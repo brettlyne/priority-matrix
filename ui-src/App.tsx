@@ -215,7 +215,7 @@ function App() {
         </div>
       )}
 
-      {status === "voting" && !userResponses && (<>
+      {status !== "setup" && !userResponses && (<>
         <div className="intro">
           <Logo />
           <p className="center">
@@ -229,7 +229,7 @@ function App() {
       </>
       )}
 
-      {status === "voting" && userResponses && (
+      {status !== "setup" && userResponses && (
         <Pagination
           showDoneButton={noNullResponses}
           currentPage={currentPage}
