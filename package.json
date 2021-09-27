@@ -8,7 +8,7 @@
     "build:main": "tsc",
     "build:ui": "npx vite build --minify esbuild --emptyOutDir=false",
     "build:main:watch": "tsc --watch",
-    "build:ui:dev:watch:": "npx vite build --minify esbuild --emptyOutDir=false --watch --mode development",
+    "build:ui:dev:watch": "npx vite build --minify esbuild --emptyOutDir=false --watch --mode development",
     "build:ui:watch": "npx vite build --minify esbuild --emptyOutDir=false --watch",
     "build": "npm run build:ui && npm run build:main",
     "dev:ui": "npx vite"
