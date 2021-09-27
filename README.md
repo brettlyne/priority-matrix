@@ -44,10 +44,11 @@ npm run dev:ui
 
 ## Scripts
 
-| script                   | description                                                             |
-| ------------------------ | ----------------------------------------------------------------------- |
-| npm run build            | one-off full build of both the iframe and widget                        |
-| npm run build:main       | one-off build of the widget code                                        |
-| npm run build:ui         | one-off build of the iframe code                                        |
-| npm run build:main:watch | watch-mode build of the widget code. rebuilds if when you save changes. |
-| npm run build:ui:watch   | watch-mode build of the iframe code. rebuilds if when you save changes. |
+| script                     | description                                                                  |
+| -------------------------- | ---------------------------------------------------------------------------- |
+| npm run build              | one-off full build of both the iframe and widget                             |
+| npm run build:main         | one-off build of the widget code                                             |
+| npm run build:ui           | one-off build of the iframe code                                             |
+| npm run build:main:watch   | watch-mode build of the widget code. rebuilds if when you save changes.      |
+| npm run build:ui:watch     | watch-mode build ui code. rebuilds if when you save changes.                 |
+| npm run build:ui:dev:watch | watch-mode **development** build ui code. rebuilds if when you save changes. |
