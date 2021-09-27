@@ -1,0 +1,232 @@
+.App {
+  padding: 0 40px;
+  height: 100%;
+}
+
+button {
+  height: 40px;
+  background: #108080;
+  border-radius: 6px;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 40px;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  &:hover {
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.13), rgba(0, 0, 0, 0.13)), #108080;
+  }
+}
+button.big {
+  height: 40px;
+  font-size: 18px;
+}
+button.secondary {
+  font-weight: 400;
+  color: #49a9a9;
+  background: #f3ffff;
+  border: 1px solid #a4c5c5;
+  &:hover {
+    color: #108080;
+    background: #ecfefe;
+  }
+  &.disabled {
+    color: #49a9a97e;
+  }
+}
+.button-group {
+  display: flex;
+  button {
+    margin-right: 1px;
+    height: 32px;
+    padding: 0 12px;
+  }
+  button:first-of-type {
+    border-radius: 6px 0 0 6px;
+    padding-left: 14px;
+  }
+  button:last-of-type {
+    border-radius: 0 6px 6px 0;
+    margin-right: 0px;
+    padding-right: 14px;
+  }
+}
+button.disabled {
+  cursor: default;
+  pointer-events: none;
+  color: rgba(255, 255, 255, 0.6);
+  * {
+    opacity: 0.6;
+  }
+}
+
+.setup {
+  padding-top: 40px;
+  padding-bottom: 40px;
+  p,
+  label {
+    color: #909e9e;
+  }
+  label {
+    display: block;
+  }
+  .logo {
+    margin-bottom: 32px;
+  }
+  .axes-names {
+    display: flex;
+  }
+  input {
+    width: 200px;
+    height: 36px;
+    color: #4a5656;
+    background: #f8f8f8;
+    border: 1px solid #a5a5a5;
+    border-radius: 6px;
+    margin-right: 20px;
+    font-size: 16px;
+    margin-bottom: 40px;
+  }
+  .ideas-list {
+    margin-top: 40px;
+    margin-bottom: 20px;
+    p {
+      margin-bottom: 8px;
+    }
+    ul {
+      list-style: disc;
+    }
+    li {
+      line-height: 22px;
+      padding: 3px;
+      padding-left: 40px;
+      padding-right: 72px;
+      margin-left: -40px;
+      margin-right: -40px;
+      position: relative;
+      font-size: 14px;
+      .delete-icon {
+        opacity: 0;
+        transition: none;
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        cursor: pointer;
+        padding-right: 8px;
+        padding-left: 8px;
+        margin-right: 32px;
+        justify-content: center;
+        align-items: center;
+      }
+      &:hover {
+        background-color: #f3f3f3;
+        transition: background 0.1s;
+        .delete-icon {
+          transition: all 0.2s;
+          display: flex;
+          opacity: 0.7;
+          transform: scale(0.93);
+          &:hover {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+      }
+    }
+  }
+}
+
+.intro {
+  text-align: center;
+  font-size: 20px;
+  line-height: 24px;
+  * {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  svg {
+    margin-top: 40px;
+    margin-bottom: 40px;
+  }
+  p {
+    margin-bottom: 20px;
+  }
+  button {
+    margin-top: 40px;
+  }
+}
+
+.likert-page {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  height: 100%;
+  padding-top: 40px;
+  padding-bottom: 80px;
+}
+.idea-text {
+  font-size: 20px;
+  line-height: 24px;
+}
+.idea-number {
+  color: #909e9e;
+  margin-right: 8px;
+}
+
+.likert-heading {
+  color: #909e9e;
+  margin-bottom: 4px;
+}
+.likert {
+  display: flex;
+  input[type="radio"] {
+    display: none;
+  }
+  label {
+    flex: 1;
+    height: 48px;
+    color: #49a9a9;
+    background: #f3ffff;
+    border: 1px solid #a4c5c5;
+    border-radius: 8px;
+    margin-right: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    &:last-of-type {
+      margin-right: 0;
+    }
+  }
+  label:hover {
+    border: 1px solid #108080;
+    color: #108080;
+    background: #ecfefe;
+  }
+  input[type="radio"]:checked + label {
+    border: 1px solid #108080;
+    box-shadow: 0px 0px 0px 1px #108080 inset;
+    color: #108080;
+    animation: flashLikert 0.3s step-end forwards;
+    background: #ecfefe;
+  }
+}
+
+@keyframes flashLikert {
+  0% {
+    opacity: 0.5;
+  }
+  33% {
+    opacity: 1;
+  }
+  66% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}

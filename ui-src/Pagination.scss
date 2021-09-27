@@ -1,0 +1,31 @@
+.Pagination {
+  overflow: hidden;
+  position: relative;
+}
+.PaginationInner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 80px;
+  transition: transform 0.3s ease;
+}
+.PaginationFooter {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  height: 80px;
+  display: flex;
+  align-items: center;
+}
+.Pagination_page-number {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex: 1;
+  p {
+    margin-right: 12px;
+    color: #909e9e;
+  }
+}

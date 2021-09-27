@@ -1,0 +1,14 @@
+{
+  "name": "Priority Matrix",
+  "id": "1018301646283745075",
+  "api": "1.0.0",
+  "editorType": [
+    "figjam"
+  ],
+  "containsWidget": true,
+  "main": "dist/code.js",
+  "ui": "dist/index.html",
+  "permissions": [
+    "currentuser"
+  ]
+}
