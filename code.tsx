@@ -158,35 +158,28 @@ function Widget() {
           </Text>
         )}
 
-        {/* BACKGROUND RECT */}
-        <Rectangle
+        {/* CHART BACKGROUND */}
+        <SVG
           x={20}
           y={40}
           width={540}
           height={540}
-          fill={"#F3FFFF"}
-          stroke={"#E1E6E9"}
+          src={`
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 541 540">
+<g clipPath="url(#a)">
+  <path fill="#F8F7FF" stroke="#E6E4FF" d="M1.03.5h539v539h-539z" />
+  <path stroke="#E9E7FD" stroke-width="4" d="m270.52 1-3 538M539.52 270h-538" />
+  <path stroke="#4609F0" stroke-opacity=".05" d="M.88.15 540.4 539.67M108.88.15 648.4 539.67M216.88.15 756.4 539.67M324.88.15 864.4 539.67M432.88.15 972.4 539.67M-431.12.15 108.4 539.67M-323.12.15 216.4 539.67M-215.12.15 324.4 539.67M-107.12.15 432.4 539.67M539.7.15.16 539.67M431.7.15l-539.53 539.52M323.7.15l-539.53 539.52M215.7.15l-539.53 539.52M107.7.15l-539.53 539.52M971.7.15 432.16 539.67M863.7.15 324.16 539.67M755.7.15 216.16 539.67M647.7.15 108.16 539.67" />
+</g>
+<path fill="#BDBAF6" fill-opacity=".22" d="M.53 0v-1h-1v1h1Zm540 0h1v-1h-1v1Zm0 540v1h1v-1h-1Zm-540 0h-1v1h1v-1Zm0-539h540v-2H.52v2Zm539-1v540h2V0h-2Zm1 539H.52v2h540v-2Zm-539 1V0h-2v540h2Z" />
+<defs>
+  <clipPath id="a">
+    <path fill="#fff" d="M.53 0h540v540H.52V0Z" />
+  </clipPath>
+</defs>
+</svg>
+        `}
         />
-
-        {/* GRID LINES */}
-        {[0, 1, 2, 3, 4].map(n =>
-          <Rectangle
-            x={20 + (108 * n)}
-            y={40}
-            width={54}
-            height={540}
-            stroke={"#E1E6E9"}
-          />
-        )}
-        {[0, 1, 2, 3, 4].map(n =>
-          <Rectangle
-            x={20}
-            y={40 + (108 * n)}
-            width={540}
-            height={54}
-            stroke={"#E1E6E9"}
-          />
-        )}
 
         {/* AXES LABELS */}
         <AutoLayout
@@ -275,7 +268,7 @@ function Widget() {
           width={244}
           height={48}
           x={170}
-          y={232}
+          y={205}
           fill="#F3FFFF"
           stroke="#A4C5C5"
           cornerRadius={6}
