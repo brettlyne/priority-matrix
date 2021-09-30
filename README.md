@@ -1,6 +1,6 @@
-# create-widget-app
+# priority-matrix
 
-Template app that creates a widget & react iframe.
+Collaboratively rate FigJam stickies on 2 axes then plot the results.
 
 Code organization:
 
