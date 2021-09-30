@@ -1,6 +1,7 @@
 # priority-matrix
 
-Collaboratively rate FigJam stickies on 2 axes then plot the results.
+Collaboratively rate FigJam stickies on 2 axes then plot the results.  
+[Video preview](./Priority-Matrix.mp4)
 
 Code organization:
 
@@ -18,28 +19,13 @@ Code organization:
 
 ## Getting started
 
-
 ### one-time setup
-1. Make a copy of this folder
-2. Update manifest.json, package.json and package-lock.json where it says `WidgetTemplate`
-3. Install the required dependencies `npm ci`
-
+1. `yarn install`
 
 ### importing your widget
 1. "Import widget from manifest"
 2. Build code `npm run build`
 3. Choose your manifest
-
-## iframe development
-
-Often the code in the iframe can get pretty complex, if helpful, you can also do
-
-```
-npm run dev:ui
-```
-
-- This command starts a development server that will serve the iframe code at http://localhost:3000
-- The development server will also hot reload any changes to your iframe code
 
 
 ## Scripts
