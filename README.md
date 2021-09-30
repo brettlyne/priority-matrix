@@ -1,7 +1,7 @@
 # priority-matrix
 
 Collaboratively rate FigJam stickies on 2 axes then plot the results.  
-[Video preview](./Priority-Matrix.mp4)
+[Video preview](https://github.com/brettlyne/priority-matrix/raw/main/Priority-Matrix.mp4)
 
 Code organization:
 
