@@ -1,5 +1,5 @@
 const { widget } = figma
-const { AutoLayout, Frame, Text, SVG, Rectangle, useSyncedState, useEffect, Ellipse } = widget
+const { AutoLayout, Frame, Text, SVG, Rectangle, useSyncedState, useEffect, Ellipse, Image } = widget
 
 // UTILITY FUNCTIONS
 const average = (array) => array.reduce((a, b) => a + b) / array.length;
@@ -28,6 +28,7 @@ function Widget() {
   const [yAxisLabel, setYAxisLabel] = useSyncedState('yAxisLabel', 'Impact')
   const [ideas, setIdeas] = useSyncedState('ideas', [])
   const [pluginStatus, setPluginStatus] = useSyncedState("pluginStatuss", "setup")
+  const [selectedIdeaIndex, setSelectedIdeaIndex] = useSyncedState("selectedIdeaIndex", -1)
 
   useEffect(() => {
 
@@ -81,6 +82,7 @@ function Widget() {
   });
 
   const sendStateToUi = (optionalState?) => {
+
     figma.ui.postMessage(JSON.stringify({
       msgType: "STATE",
       pluginStatus: optionalState?.pluginStatus || pluginStatus,
@@ -88,6 +90,7 @@ function Widget() {
       xAxis: optionalState?.xAxis || xAxisLabel,
       yAxis: optionalState?.yAxis || yAxisLabel,
       userId: figma.currentUser.id,
+      photoUrl: figma.currentUser.photoUrl,
       responsesByUser
     }))
   }
@@ -124,6 +127,30 @@ function Widget() {
       }
     }
   }
+
+  {/* ImageTest */ }
+  const userImages = () => {
+    const imgDots = [];
+
+    responsesByUser.forEach(resp => {
+      const match = resp.responses.find(response => response.questionIdx === selectedIdeaIndex)
+      const x = match.xRating === null ? -1 : match.xRating
+      const y = match.yRating === null ? -1 : match.yRating
+      imgDots.push(
+        <Image
+          key={resp.userId}
+          x={20 + (x * 54) - 12}
+          y={40 + ((10 - y) * 54) - 12}
+          width={24}
+          height={24}
+          cornerRadius={12}
+          src={resp.userPhotoUrl}
+        />
+      )
+    });
+    return imgDots;
+  }
+
 
   return (
     <AutoLayout
@@ -284,8 +311,9 @@ function Widget() {
         </AutoLayout>}
 
         {/* DATA DOTS */}
-        {dataPlot.map(d => (
+        {selectedIdeaIndex === -1 && dataPlot.map(d => (
           <AutoLayout
+            key={d.letter}
             verticalAlignItems='center'
             x={20 + (d.avgX * 54) - 6}
             y={40 + ((10 - d.avgY) * 54) - 10}
@@ -302,34 +330,57 @@ function Widget() {
             </Text>
           </AutoLayout>
         ))}
-
+        {/* photo dots when an idea is selected */}
+        {selectedIdeaIndex >= 0 && userImages()}
 
       </Frame>
 
-      {/* IDEAS LIST TO RIGHT */}
       {pluginStatus === "revealed" && <AutoLayout
         direction="vertical"
-        spacing={6}
-        width={350}
+        spacing={0}
+        width={'hug-contents'}
         height={'hug-contents'}
         padding={{ top: 60, left: 0 }}
       >
         {ideas.map((idea, i) => {
+          const selected = i === selectedIdeaIndex;
           return <AutoLayout
+            key={i}
             height={'hug-contents'}
-            width={'fill-parent'}
-            spacing={10}
+            width={'hug-contents'}
+            spacing={8}
+            fill={selected ? '#107680' : null}
+            padding={{ left: 12, right: 10, top: 5, bottom: 6 }}
+            cornerRadius={6}
+            onClick={async () => {
+              await new Promise((resolve) => {
+                setSelectedIdeaIndex(selected ? -1 : i);
+              })
+            }}
           >
-            <Text fontSize={16} width={20} horizontalAlignText='right' lineHeight={20} fill='#108080' fontWeight={500}>
+            <Text fontSize={16} width={12} horizontalAlignText='right' lineHeight={20} fill={selected ? '#fff' : '#108080'} fontWeight={500}>
               {numToLetter(i)}
             </Text>
-            <Text fontSize={16} width='fill-parent' lineHeight={20} fill='#272B2B' fontWeight={400}>
+            <Text fontSize={16} width={320} lineHeight={20} fill={selected ? '#fff' : '#272B2B'} fontWeight={400}>
               {idea.trim()}
             </Text>
+            {selected && <SVG
+              src={`
+<svg width="20" height="16" viewBox="0 0 20 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M19 14L11 6" stroke="white" stroke-width="1.2"/>
+  <path d="M11 14L19 6" stroke="white" stroke-width="1.2"/>
+</svg>
+              `}
+            />}
+
           </AutoLayout>
         })}
 
       </AutoLayout>}
+
+
+
+
 
     </AutoLayout>
   )

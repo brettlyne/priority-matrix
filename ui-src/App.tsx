@@ -83,6 +83,7 @@ function App() {
 
   const [status, setStatus] = React.useState("setup");
   const [userId, setUserId] = React.useState(null);
+  const [userPhotoUrl, setUserPhotoUrl] = React.useState(null);
   const [ideas, setIdeas] = React.useState<string[]>([]);
   const [xAxis, setXAxis] = React.useState('Effort')
   const [yAxis, setYAxis] = React.useState('Impact')
@@ -110,6 +111,7 @@ function App() {
       setXAxis(message.xAxis)
       setYAxis(message.yAxis)
       setUserId(message.userId)
+      setUserPhotoUrl(message.photoUrl)
       setResponsesByUser(message.responsesByUser)
     }
   }
@@ -134,11 +136,11 @@ function App() {
       })
     }
     blankResponses = blankResponses.sort(() => Math.random() - 0.5) // shuffle array to randomize order
-    setResponsesByUser([...responsesByUser, { userId, responses: blankResponses }])
+    setResponsesByUser([...responsesByUser, { userId, userPhotoUrl, responses: blankResponses }])
     parent?.postMessage?.({
       pluginMessage: JSON.stringify({
         msgType: 'newResponse',
-        response: { userId, responses: blankResponses }
+        response: { userId, userPhotoUrl, responses: blankResponses }
       })
     }, '*')
   }

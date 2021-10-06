@@ -1,4 +1,4 @@
-// Figma Plugin API version 1, update 35
+// Figma Plugin API version 1, update 30
 
 declare global {
   // Global variable with Figma's plugin API.
@@ -9,7 +9,7 @@ declare global {
   }
   const console: Console
 
-  type ArgFreeEventType =
+  type EventType =
     | 'selectionchange'
     | 'currentpagechange'
     | 'close'
@@ -19,6 +19,7 @@ declare global {
     | 'timerresume'
     | 'timeradjust'
     | 'timerdone'
+    | 'run'
 
   interface PluginAPI {
     readonly apiVersion: '1.0.0'
@@ -56,12 +57,9 @@ declare global {
     readonly root: DocumentNode
     currentPage: PageNode
 
-    on(type: ArgFreeEventType, callback: () => void): void
-    once(type: ArgFreeEventType, callback: () => void): void
-    off(type: ArgFreeEventType, callback: () => void): void
-    on(type: 'run', callback: (event: RunEvent) => void): void
-    once(type: 'run', callback: (event: RunEvent) => void): void
-    off(type: 'run', callback: (event: RunEvent) => void): void
+    on(type: EventType, callback: (event?: RunEvent) => void): void
+    once(type: EventType, callback: (event?: RunEvent) => void): void
+    off(type: EventType, callback: (event?: RunEvent) => void): void
 
     readonly mixed: unique symbol
 
@@ -225,31 +223,24 @@ declare global {
   }
 
   interface SuggestionResults {
-    setSuggestions(
-      suggestions: Array<
-        string | { name: string; data?: any; icon?: string | Uint8Array; iconUrl?: string }
-      >,
-    ): void
-    setError(message: string): void
-    setLoadingMessage(message: string): void
+    setSuggestions: (suggestions: string[]) => void
   }
 
-  type ParameterInputEvent<ParametersType = ParameterValues> = {
-    query: string
-    key: string
-    parameters: Partial<ParametersType>
-    result: SuggestionResults
-  }
+  type ParameterChangeHandler = (
+    parameters: ParameterValues,
+    suggestionKey: string,
+    result: SuggestionResults,
+  ) => void
 
   interface ParametersAPI {
-    on(type: 'input', callback: (event: ParameterInputEvent) => void): void
-    once(type: 'input', callback: (event: ParameterInputEvent) => void): void
-    off(type: 'input', callback: (event: ParameterInputEvent) => void): void
+    on(type: 'input', callback: ParameterChangeHandler): void
+    once(type: 'input', callback: ParameterChangeHandler): void
+    off(type: 'input', callback: ParameterChangeHandler): void
   }
 
-  interface RunEvent<ParametersType = ParameterValues | undefined> {
+  interface RunEvent {
     command: string
-    parameters: ParametersType
+    parameters?: ParameterValues
   }
 
   ////////////////////////////////////////////////////////////////////////////////
@@ -827,10 +818,6 @@ declare global {
     readonly blendMode?: BlendMode
   }
 
-  interface VariantMixin {
-    readonly variantProperties: { [property: string]: string } | null
-  }
-
   interface TextSublayerNode {
     readonly hasMissingFont: boolean
 
@@ -909,7 +896,6 @@ declare global {
     guides: ReadonlyArray<Guide>
     selection: ReadonlyArray<SceneNode>
     selectedTextRange: { node: TextNode; start: number; end: number } | null
-    flowStartingPoints: ReadonlyArray<{ nodeId: string; name: string }>
 
     backgrounds: ReadonlyArray<Paint>
 
@@ -998,21 +984,19 @@ declare global {
     readonly type: 'COMPONENT_SET'
     clone(): ComponentSetNode
     readonly defaultVariant: ComponentNode
-    readonly variantGroupProperties: { [property: string]: { values: string[] } }
   }
 
-  interface ComponentNode extends DefaultFrameMixin, PublishableMixin, VariantMixin {
+  interface ComponentNode extends DefaultFrameMixin, PublishableMixin {
     readonly type: 'COMPONENT'
     clone(): ComponentNode
     createInstance(): InstanceNode
   }
 
-  interface InstanceNode extends DefaultFrameMixin, VariantMixin {
+  interface InstanceNode extends DefaultFrameMixin {
     readonly type: 'INSTANCE'
     clone(): InstanceNode
     mainComponent: ComponentNode | null
     swapComponent(componentNode: ComponentNode): void
-    setProperties(properties: { [property: string]: string }): void
     detachInstance(): FrameNode
     scaleFactor: number
   }
@@ -1177,10 +1161,6 @@ declare global {
     warn(message?: any, ...optionalParams: any[]): void
     clear(): void
   }
-  function setTimeout(callback: Function, timeout: number): number
-  function clearTimeout(handle: number): void
-  function setInterval(callback: Function, timeout: number): number
-  function clearInterval(handle: number): void
 
   interface User {
     readonly id: string
@@ -1209,8 +1189,7 @@ declare global {
 
     // Hooks
     useWidgetId(): string
-    useSyncedState<T>(name: string, defaultValue: T): [T, (newValue: T) => void]
-    useSyncedMap<T>(name: string): SyncedMap<T>
+    useSyncedState<T>(key: string, defaultValue: T): [T, (newValue: T) => void]
     usePropertyMenu(
       items: WidgetPropertyMenuItem[],
       onChange: (event: WidgetPropertyEvent) => void | Promise<void>,
@@ -1228,17 +1207,6 @@ declare global {
     Ellipse: Ellipse
     Text: TextComponent
     SVG: SVG
-  }
-
-  type SyncedMap<T> = {
-    readonly length: number
-
-    get(key: string): T | undefined
-    set(key: string, value: T): void
-    delete(key: string): void
-    keys(): string[]
-    values(): T[]
-    entries(): [string, T][]
   }
 
   type AutoLayout = FunctionalWidget<AutoLayoutProps>
@@ -1295,7 +1263,6 @@ declare global {
   interface BaseProps extends WidgetJSX.BaseProps {
     // We have a custom onClick api that returns a promise
     onClick?: () => Promise<any> | void
-    key?: string | number
   }
 
   interface HasChildrenProps {
