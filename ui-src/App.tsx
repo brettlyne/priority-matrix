@@ -39,7 +39,7 @@ const LikertPage = ({ idea, ideaIndex, xAxis, yAxis, xRating, yRating, handleXRa
     <div>
       <p className="likert-heading">{xAxis}</p>
       <div className="likert">
-        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => <Fragment key={`impact${ideaIndex}-${n}-x`}>
+        {[1, 2, 3, 4, 5].map(n => <Fragment key={`impact${ideaIndex}-${n}-x`}>
           <input
             type="radio"
             onChange={e => { handleXRating(parseInt(e.target.value)) }}
@@ -58,7 +58,7 @@ const LikertPage = ({ idea, ideaIndex, xAxis, yAxis, xRating, yRating, handleXRa
       <p className="likert-heading">{yAxis}</p>
       <div className="likert">
 
-        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => <Fragment key={`impact${ideaIndex}-${n}-y`}>
+        {[1, 2, 3, 4, 5].map(n => <Fragment key={`impact${ideaIndex}-${n}-y`}>
           <input
             type="radio"
             onChange={e => { handleYRating(parseInt(e.target.value)) }}
@@ -179,29 +179,34 @@ function App() {
         <div className="setup">
           <div className="settings">
             <Logo />
-            <div className="axes-names">
-              <div>
-                <label htmlFor="xAxis">X-axis</label>
-                <input type="text" name="xAxis" id="xAxis" defaultValue="Effort" ref={xAxisRef} />
-              </div>
-              <div>
-                <label htmlFor="yAxis">Y-axis</label>
-                <input type="text" name="yAxis" id="yAxis" defaultValue="Impact" ref={yAxisRef} />
-              </div>
-            </div>
-            <p>Participants will see items in <br />randomized order.</p>
+
+            <p>Select some stickies then click the button 👇</p>
             <div style={{ height: '12px' }}></div>
             <button
               className="secondary full-width"
               onClick={() => { parent?.postMessage?.({ pluginMessage: JSON.stringify({ msgType: 'importSelectedIdeas' }) }, '*') }}>
               Add selected stickies to prioritize
             </button>
-            <div style={{ height: '12px' }}></div>
-            <button className={`full-width ${ideas.length === 0 ? 'disabled' : ''}`} onClick={startVoting}>Start voting</button>
+
+            {ideas.length > 0 && <>
+              <div style={{ height: '24px' }}></div>
+              {/* <div className="axes-names"> */}
+              <p>Rate items on:</p>
+              <div style={{ height: '8px' }}></div>
+
+              <div className="axes-names">
+                <input type="text" name="xAxis" id="xAxis" defaultValue="Effort" ref={xAxisRef} placeholder='Effort' />
+                <span>&</span>
+                <input type="text" name="yAxis" id="yAxis" defaultValue="Impact" ref={yAxisRef} placeholder='Impact' />
+              </div>
+
+              <div style={{ height: '40px' }}></div>
+              <button className={`full-width ${ideas.length === 0 ? 'disabled' : ''}`} onClick={startVoting}>Start voting</button>
+              <p style={{ fontSize: '14px', marginTop: '8px' }}>Participants will see items in randomized order.</p>
+            </>}
           </div>
 
 
-          {/* {ideas.length > 0 && <> */}
           <div className="ideas-list">
             <p>Items to vote on:</p>
             <ul>
@@ -215,7 +220,6 @@ function App() {
               </li>)}
             </ul>
           </div>
-          {/* </>} */}
 
         </div>
       )}

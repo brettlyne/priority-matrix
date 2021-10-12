@@ -2,6 +2,7 @@
   "name": "Priority Matrix",
   "id": "1024916888280193111",
   "api": "1.0.0",
+  "widgetApi": "1.0.0",
   "editorType": [
     "figjam"
   ],

@@ -108,8 +108,10 @@ function Widget() {
       const yRatings = []
       responsesByUser.forEach(resp => {
         const match = resp.responses.find(response => response.questionIdx === i)
-        if (match.xRating !== null) { xRatings.push(match.xRating) }
-        if (match.yRating !== null) { yRatings.push(match.yRating) }
+        if (match.xRating !== null && match.yRating !== null) {
+          xRatings.push(match.xRating)
+          yRatings.push(match.yRating)
+        }
       });
       if (xRatings.length === 0 || yRatings.length === 0) {
         continue;
@@ -122,35 +124,48 @@ function Widget() {
       })
       if (pointMatchIdx >= 0) {
         dataPlot[pointMatchIdx].letter += `,${letter}`
+        dataPlot[pointMatchIdx].ideaIndices.push(i)
       } else {
-        dataPlot.push({ avgX, avgY, letter, idea: ideas[i] })
+        dataPlot.push({ avgX, avgY, letter, idea: ideas[i], ideaIndices: [i] })
       }
     }
   }
 
   {/* ImageTest */ }
   const userImages = () => {
-    const imgDots = [];
+    const DOT_SIZE = 24;
 
+    const imgDotsData = [];
     responsesByUser.forEach(resp => {
       const match = resp.responses.find(response => response.questionIdx === selectedIdeaIndex)
       const x = match.xRating === null ? -1 : match.xRating
       const y = match.yRating === null ? -1 : match.yRating
-      imgDots.push(
-        <Image
-          key={resp.userId}
-          x={20 + (x * 54) - 12}
-          y={40 + ((10 - y) * 54) - 12}
-          width={24}
-          height={24}
-          cornerRadius={12}
-          src={resp.userPhotoUrl}
-        />
-      )
+      const samePointProceedingCount = imgDotsData.filter(dot => dot.x === x && dot.y === y).length
+      imgDotsData.push({
+        key: resp.userId,
+        photoUrl: resp.userPhotoUrl,
+        x,
+        y,
+        samePointProceedingCount
+      })
     });
+
+    const imgDots = imgDotsData.map(dot => (
+      <Image
+        key={dot.key}
+        x={20 + ((dot.x - 1) * 135) - (DOT_SIZE / 2) + (dot.samePointProceedingCount * 12)}
+        y={40 + ((5 - dot.y) * 135) - (DOT_SIZE / 2)}
+        width={DOT_SIZE}
+        height={DOT_SIZE}
+        cornerRadius={(DOT_SIZE / 2)}
+        src={dot.photoUrl}
+      />
+    ))
+
     return imgDots;
   }
 
+  const selectedIdeaDotIndex = dataPlot.findIndex(data => data.ideaIndices.includes(selectedIdeaIndex))
 
   return (
     <AutoLayout
@@ -166,23 +181,33 @@ function Widget() {
           src='<svg className="logo" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 260 28" width="260px" height="28px"><path fill="#385959" d="M12 0h236v28H12zM256 8h4v4h-4zM252 4h4v4h-4zM248 0h4v4h-4zM256 16h4v4h-4zM252 12h4v4h-4zM248 4h4v8h-4zM256 24h4v4h-4zM252 20h4v4h-4zM248 16h4v4h-4z" /><path fill="#fff" d="M28 16h-4v8h-4V4h12.1v4h-8v4h4v4Zm.1-8h4v8h-4V8ZM36.6 4h12v4h-8v4h4v4h4v8h-4v-8h-4v8h-4V4Zm8 4h4v4h-4V8ZM53.1 4h4v20h-4V4ZM61.7 4h4v20h-4V4Zm4 0h8v20h-8v-4h4V8h-4V4ZM78.3 4h12v4h-8v4h4v4h4v8h-4v-8h-4v8h-4V4Zm8 4h4v4h-4V8ZM94.8 4h4v20h-4V4ZM103.3 4h12v4h-4v16h-4V8h-4V4ZM119.9 4h3.9v8h4V4h4v12h-4v8h-4v-8h-4V4ZM145 4h4v4h4v4h4V8h4V4h4v20h-4V12h-4v4h-4v-4h-4v12h-4V4ZM169.5 4h12v20h-4V8h-4v16h-4V4Zm4 8h4v4h-4v-4ZM186 4h12v4h-4v16h-3.9V8h-4V4ZM202.7 4h12v4h-8v4h4v4h4v8h-4v-8h-4v8h-4V4Zm8 4h4v4h-4V8ZM219.2 4h4v20h-4V4ZM227.8 4h4v8h4V4h4v8h-4v4h4v8h-4v-8h-4v8h-4v-8h4v-4h-4V4Z" /><path fill="#385959" d="M4 0H0v4h4zM8 4H4v4h4zM12 8H8v4h4zM4 8H0v4h4zM8 12H4v4h4zM12 16H8v9h4zM4 16H0v4h4zM8 20H4v4h4z" /><path fill="#385959" d="M12 24H8v4h4z" /></svg>'
         />
         {pluginStatus === 'revealed' && (
-          <Text
-            x={560}
-            y={4}
-            horizontalAlignText='right'
-            fontSize={14}
-            fontWeight={500}
-            lineHeight={20}
-            fill='#107680'
-            textDecoration='underline'
+          <AutoLayout
+            direction="horizontal"
+            horizontalAlignItems="center"
+            verticalAlignItems="center"
+            width={200}
+            height={28}
+            x={360}
+            y={0}
+            // fill="#107680"
+            fill="#5E57A4"
+            cornerRadius={4}
             onClick={async () => {
               await new Promise((resolve) => {
                 showUI();
               })
             }}
           >
-            Add or edit your ratings
-          </Text>
+            <Text fontSize={14} fontWeight={700} width="hug-contents" lineHeight={20} fill={'#ffffff'}
+              onClick={async () => {
+                await new Promise((resolve) => {
+                  showUI();
+                })
+              }}
+            >
+              Add or edit your ratings
+            </Text>
+          </AutoLayout>
         )}
 
         {/* CHART BACKGROUND */}
@@ -217,13 +242,13 @@ function Widget() {
           spacing="auto"
         >
           <Text fontSize={16} fontWeight={500} width="hug-contents" lineHeight={20} fill={'#819494'}>
-            0
+            1
           </Text>
           <Text fontSize={16} fontWeight={500} width="hug-contents" lineHeight={20} fill={'#819494'}>
             {xAxisLabel}
           </Text>
           <Text fontSize={16} fontWeight={500} width="hug-contents" lineHeight={20} fill={'#819494'}>
-            10
+            5
           </Text>
         </AutoLayout>
         <AutoLayout
@@ -235,13 +260,13 @@ function Widget() {
           rotation={90}
         >
           <Text fontSize={16} fontWeight={500} width="hug-contents" lineHeight={20} fill={'#819494'}>
-            0
+            1
           </Text>
           <Text fontSize={16} fontWeight={500} width="hug-contents" lineHeight={20} fill={'#819494'}>
             {yAxisLabel}
           </Text>
           <Text fontSize={16} fontWeight={500} width="hug-contents" lineHeight={20} fill={'#819494'}>
-            10
+            5
           </Text>
         </AutoLayout>
 
@@ -254,7 +279,8 @@ function Widget() {
           height={48}
           x={170}
           y={124}
-          fill="#107680"
+          // fill="#107680"
+          fill="#5E57A4"
           cornerRadius={6}
           onClick={async () => {
             await new Promise((resolve) => {
@@ -275,7 +301,8 @@ function Widget() {
           height={48}
           x={170}
           y={124}
-          fill="#107680"
+          // fill="#107680"
+          fill="#5E57A4"
           cornerRadius={6}
           onClick={async () => {
             await new Promise((resolve) => {
@@ -296,8 +323,10 @@ function Widget() {
           height={48}
           x={170}
           y={205}
-          fill="#F3FFFF"
-          stroke="#A4C5C5"
+          // fill="#F3FFFF"
+          // stroke="#A4C5C5"
+          fill="#EFEDFF"
+          stroke="#5E57A4"
           cornerRadius={6}
           onClick={async () => {
             await new Promise((resolve) => {
@@ -305,18 +334,37 @@ function Widget() {
             })
           }}
         >
-          <Text fontSize={16} width="hug-contents" lineHeight={20} fill={'#49A9A9'}>
+          <Text fontSize={16} width="hug-contents" lineHeight={20} fill={'#332D73'}>
             Reveal results
           </Text>
         </AutoLayout>}
 
+        {/* photo dots when an idea is selected */}
+        {selectedIdeaIndex >= 0 && userImages()}
+        {selectedIdeaIndex >= 0 && (
+          <AutoLayout
+            verticalAlignItems='center'
+            x={20 + ((dataPlot[selectedIdeaDotIndex].avgX - 1) * 135) - 5}
+            y={40 + ((5 - dataPlot[selectedIdeaDotIndex].avgY) * 135) - 5}
+            spacing={6}
+          >
+            <Ellipse
+              y={4}
+              width={10}
+              height={10}
+              fill='#108080'
+              stroke='#fff'
+            />
+          </AutoLayout>
+        )}
+
         {/* DATA DOTS */}
-        {selectedIdeaIndex === -1 && dataPlot.map(d => (
+        {selectedIdeaIndex === -1 && dataPlot.map((d, i) => (
           <AutoLayout
             key={d.letter}
             verticalAlignItems='center'
-            x={20 + (d.avgX * 54) - 6}
-            y={40 + ((10 - d.avgY) * 54) - 10}
+            x={20 + ((d.avgX - 1) * 135) - 6}
+            y={40 + ((5 - d.avgY) * 135) - 10}
             spacing={6}
           >
             <Ellipse
@@ -330,8 +378,6 @@ function Widget() {
             </Text>
           </AutoLayout>
         ))}
-        {/* photo dots when an idea is selected */}
-        {selectedIdeaIndex >= 0 && userImages()}
 
       </Frame>
 
