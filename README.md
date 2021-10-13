@@ -3,6 +3,8 @@
 Collaboratively rate FigJam stickies on 2 axes then plot the results.  
 [Video preview](https://github.com/brettlyne/priority-matrix/raw/main/Priority-Matrix.mp4)
 
+<!-- [Priority Matrix in Figma widget gallery](https://www.figma.com/community/widget/1024916888280193111) -->
+
 Built by Design Technologists at Intuit.
 
 ### Code organization:
