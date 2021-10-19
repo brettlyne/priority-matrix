@@ -83,11 +83,11 @@ function App() {
 
   const [status, setStatus] = React.useState("setup");
   const [userId, setUserId] = React.useState(null);
-  const [userPhotoUrl, setUserPhotoUrl] = React.useState(null);
+  const [userPhoto, setUserPhoto] = React.useState(null);
   const [ideas, setIdeas] = React.useState<string[]>([]);
   const [xAxis, setXAxis] = React.useState('Effort')
   const [yAxis, setYAxis] = React.useState('Impact')
-  const [responsesByUser, setResponsesByUser] = React.useState<object[]>([])
+  const [responsesByUser, setResponsesByUser] = React.useState<object>({})
   const [currentPage, setCurrentPage] = React.useState(0);
 
   const xAxisRef = React.useRef<HTMLInputElement>(null);
@@ -111,7 +111,7 @@ function App() {
       setXAxis(message.xAxis)
       setYAxis(message.yAxis)
       setUserId(message.userId)
-      setUserPhotoUrl(message.photoUrl)
+      setUserPhoto(message.userPhoto)
       setResponsesByUser(message.responsesByUser)
     }
   }
@@ -136,38 +136,40 @@ function App() {
       })
     }
     blankResponses = blankResponses.sort(() => Math.random() - 0.5) // shuffle array to randomize order
-    setResponsesByUser([...responsesByUser, { userId, userPhotoUrl, responses: blankResponses }])
+    setResponsesByUser({ userId, userPhoto, responses: blankResponses })
     parent?.postMessage?.({
       pluginMessage: JSON.stringify({
         msgType: 'newResponse',
-        response: { userId, userPhotoUrl, responses: blankResponses }
+        userId,
+        userPhoto,
+        responses: blankResponses
       })
     }, '*')
   }
 
-  const addResponse = ({ userIdx = 0, responseIdx = 0, axis = 'x', value = 0 }) => {
+  const addResponse = ({ responseIdx = 0, axis = 'x', value = 0 }) => {
     if (
       currentPage < ideas.length - 1 &&
-      responsesByUser[userIdx].responses[responseIdx][`${axis}Rating`] === null &&
-      responsesByUser[userIdx].responses[responseIdx][`${axis === 'x' ? 'y' : 'x'}Rating`] !== null
+      responsesByUser.responses[responseIdx][`${axis}Rating`] === null &&
+      responsesByUser.responses[responseIdx][`${axis === 'x' ? 'y' : 'x'}Rating`] !== null
     ) {
       setTimeout(() => {
         setCurrentPage(currentPage + 1)
       }, 700);
     }
-    const newResponses = [...responsesByUser]
-    newResponses[userIdx].responses[responseIdx][`${axis}Rating`] = value
+    const newResponses = { ...responsesByUser }
+    newResponses.responses[responseIdx][`${axis}Rating`] = value
     setResponsesByUser(newResponses)
     parent?.postMessage?.({
       pluginMessage: JSON.stringify(
-        { msgType: 'addResponse', userIdx, responseIdx, axis, value }
+        { msgType: 'addResponse', userId, responseIdx, axis, value }
       )
     }, '*')
   }
 
-  const userResponseIdx = responsesByUser.findIndex(response => response.userId === userId)
-  const userResponses = responsesByUser.find(response => response.userId === userId)
-  const noNullResponses = userResponses && userResponses.responses.reduce(
+  const userResponses = { ...responsesByUser }
+
+  const noNullResponses = userResponses.responses && userResponses.responses.reduce(
     (prev, curr) => curr.xRating !== null && curr.yRating !== null && prev,
     true
   )
@@ -224,7 +226,7 @@ function App() {
         </div>
       )}
 
-      {status !== "setup" && !userResponses && (<>
+      {status !== "setup" && !userResponses.responses && (<>
         <div className="intro">
           <Logo />
           <p className="center">
@@ -238,12 +240,12 @@ function App() {
       </>
       )}
 
-      {status !== "setup" && userResponses && (
+      {status !== "setup" && userResponses.responses && (
         <Pagination
           showDoneButton={noNullResponses}
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
-          pages={userResponses.responses.map((response: object, i: number) => (
+          pages={userResponses.responses && userResponses.responses.map((response: object, i: number) => (
             <LikertPage
               key={i}
               idea={ideas[response.questionIdx]}
@@ -254,7 +256,6 @@ function App() {
               yRating={response.yRating}
               handleXRating={(value: number) => {
                 addResponse({
-                  userIdx: userResponseIdx,
                   responseIdx: i,
                   axis: 'x',
                   value
@@ -262,7 +263,6 @@ function App() {
               }}
               handleYRating={(value: number) => {
                 addResponse({
-                  userIdx: userResponseIdx,
                   responseIdx: i,
                   axis: 'y',
                   value

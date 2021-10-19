@@ -1,5 +1,5 @@
 const { widget } = figma
-const { AutoLayout, Frame, Text, SVG, Rectangle, useSyncedState, useEffect, Ellipse, Image } = widget
+const { AutoLayout, Frame, Text, SVG, Rectangle, useSyncedState, useEffect, Ellipse, Image, useSyncedMap } = widget
 
 // UTILITY FUNCTIONS
 const average = (array) => array.reduce((a, b) => a + b) / array.length;
@@ -21,13 +21,22 @@ const numToLetter = (n) => {
   return chars.join('');
 };
 
+interface UserResponse {
+  userId: number;
+  userPhoto: string;
+  responses: [{
+    questionIdx: number,
+    xRating: number,
+    yRating: number,
+  }]
+}
 
 function Widget() {
-  const [responsesByUser, setResponsesByUser] = useSyncedState('responsesByUser', [])
+  const responsesByUser = useSyncedMap('responsesByUser')
   const [xAxisLabel, setXAxisLabel] = useSyncedState('xAxisLabel', 'Effort')
   const [yAxisLabel, setYAxisLabel] = useSyncedState('yAxisLabel', 'Impact')
   const [ideas, setIdeas] = useSyncedState('ideas', [])
-  const [pluginStatus, setPluginStatus] = useSyncedState("pluginStatuss", "setup")
+  const [pluginStatus, setPluginStatus] = useSyncedState("pluginStatus", "setup")
   const [selectedIdeaIndex, setSelectedIdeaIndex] = useSyncedState("selectedIdeaIndex", -1)
 
   useEffect(() => {
@@ -63,14 +72,17 @@ function Widget() {
       }
 
       if (msg.msgType === 'newResponse') {
-        setResponsesByUser([...responsesByUser, msg.response]);
+        responsesByUser.set(msg.userId, {
+          userPhoto: msg.userPhoto,
+          responses: msg.responses
+        });
       }
 
       if (msg.msgType === 'addResponse') {
-        const newResponses = [...responsesByUser]
-        if (newResponses[msg.userIdx]) {
-          newResponses[msg.userIdx].responses[msg.responseIdx][`${msg.axis}Rating`] = msg.value
-          setResponsesByUser(newResponses)
+        const userResponses = responsesByUser.get(msg.userId) as UserResponse;
+        if (userResponses && userResponses.responses) {
+          userResponses.responses[msg.responseIdx][`${msg.axis}Rating`] = msg.value
+          responsesByUser.set(msg.userId, userResponses)
         }
       }
 
@@ -90,8 +102,8 @@ function Widget() {
       xAxis: optionalState?.xAxis || xAxisLabel,
       yAxis: optionalState?.yAxis || yAxisLabel,
       userId: figma.currentUser.id,
-      photoUrl: figma.currentUser.photoUrl,
-      responsesByUser
+      userPhoto: figma.currentUser.photoUrl,
+      responsesByUser: responsesByUser.get(figma.currentUser.id)
     }))
   }
 
@@ -106,13 +118,16 @@ function Widget() {
     for (let i = 0; i < ideas.length; i++) {
       const xRatings = []
       const yRatings = []
-      responsesByUser.forEach(resp => {
+
+      responsesByUser.keys().forEach(key => {
+        const resp = responsesByUser.get(key) as UserResponse;
         const match = resp.responses.find(response => response.questionIdx === i)
         if (match.xRating !== null && match.yRating !== null) {
           xRatings.push(match.xRating)
           yRatings.push(match.yRating)
         }
       });
+
       if (xRatings.length === 0 || yRatings.length === 0) {
         continue;
       }
@@ -136,14 +151,15 @@ function Widget() {
     const DOT_SIZE = 24;
 
     const imgDotsData = [];
-    responsesByUser.forEach(resp => {
+    responsesByUser.keys().forEach(key => {
+      const resp = responsesByUser.get(key) as UserResponse;
       const match = resp.responses.find(response => response.questionIdx === selectedIdeaIndex)
       const x = match.xRating === null ? -1 : match.xRating
       const y = match.yRating === null ? -1 : match.yRating
       const samePointProceedingCount = imgDotsData.filter(dot => dot.x === x && dot.y === y).length
       imgDotsData.push({
         key: resp.userId,
-        photoUrl: resp.userPhotoUrl,
+        userPhoto: resp.userPhoto,
         x,
         y,
         samePointProceedingCount
@@ -158,7 +174,7 @@ function Widget() {
         width={DOT_SIZE}
         height={DOT_SIZE}
         cornerRadius={(DOT_SIZE / 2)}
-        src={dot.photoUrl}
+        src={dot.userPhoto}
       />
     ))
 
@@ -341,7 +357,7 @@ function Widget() {
 
         {/* photo dots when an idea is selected */}
         {selectedIdeaIndex >= 0 && userImages()}
-        {selectedIdeaIndex >= 0 && (
+        {selectedIdeaIndex >= 0 && dataPlot[selectedIdeaDotIndex] && (
           <AutoLayout
             verticalAlignItems='center'
             x={20 + ((dataPlot[selectedIdeaDotIndex].avgX - 1) * 135) - 5}
