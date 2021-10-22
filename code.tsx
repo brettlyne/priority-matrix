@@ -344,11 +344,7 @@ function Widget() {
           fill="#EFEDFF"
           stroke="#5E57A4"
           cornerRadius={6}
-          onClick={async () => {
-            await new Promise((resolve) => {
-              setPluginStatus('revealed');
-            })
-          }}
+          onClick={() => { setPluginStatus('revealed') }}
         >
           <Text fontSize={16} width="hug-contents" lineHeight={20} fill={'#332D73'}>
             Reveal results
@@ -414,11 +410,7 @@ function Widget() {
             fill={selected ? '#107680' : null}
             padding={{ left: 12, right: 10, top: 5, bottom: 6 }}
             cornerRadius={6}
-            onClick={async () => {
-              await new Promise((resolve) => {
-                setSelectedIdeaIndex(selected ? -1 : i);
-              })
-            }}
+            onClick={() => { setSelectedIdeaIndex(selected ? -1 : i) }}
           >
             <Text fontSize={16} width={12} horizontalAlignText='right' lineHeight={20} fill={selected ? '#fff' : '#108080'} fontWeight={500}>
               {numToLetter(i)}
@@ -439,10 +431,6 @@ function Widget() {
         })}
 
       </AutoLayout>}
-
-
-
-
 
     </AutoLayout>
   )
