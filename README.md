@@ -1,14 +1,12 @@
 # priority-matrix
 
-Collaboratively rate FigJam stickies on 2 axes then plot the results.  
-  
-[Video preview (1:47)](https://github.com/brettlyne/priority-matrix/raw/main/Priority_Matrix_demo_10-21-2021.mp4) 
-  
-[Figma Widget Page](https://www.figma.com/community/widget/1024916888280193111) 
+Collaboratively rate FigJam stickies on 2 axes then plot the results.
+
+[Video preview (1:47)](https://github.com/brettlyne/priority-matrix/raw/main/Priority_Matrix_demo_10-21-2021.mp4)
+
+[Figma Widget Page](https://www.figma.com/community/widget/1024916888280193111)
 
 <!-- [Priority Matrix in Figma widget gallery](https://www.figma.com/community/widget/1024916888280193111) -->
-
-Built by Design Technologists at Intuit.
 
 ### Code organization:
 
@@ -27,13 +25,14 @@ Built by Design Technologists at Intuit.
 ## Getting started
 
 ### one-time setup
+
 1. `yarn install`
 
 ### importing your widget
+
 1. "Import widget from manifest"
 2. Build code `npm run build`
 3. Choose your manifest
-
 
 ## Scripts
 
@@ -45,3 +44,4 @@ Built by Design Technologists at Intuit.
 | npm run build:main:watch   | watch-mode build of the widget code. rebuilds if when you save changes.      |
 | npm run build:ui:watch     | watch-mode build ui code. rebuilds if when you save changes.                 |
 | npm run build:ui:dev:watch | watch-mode **development** build ui code. rebuilds if when you save changes. |
+| npm run watch              | watch-mode build of both the ui and main. rebuilds when you save changes.    |
