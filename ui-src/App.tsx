@@ -138,6 +138,15 @@ function App() {
       alert("Scale start must be less than scale end.");
       return;
     }
+    if (
+      isNaN(scaleStart) ||
+      isNaN(scaleEnd) ||
+      scaleStart % 1 !== 0 ||
+      scaleEnd % 1 !== 0
+    ) {
+      alert("Scale start and scale end must be integers.");
+      return;
+    }
     const message = {
       msgType: "startVoting",
       xAxis: xAxisRef.current?.value || "Effort",
@@ -278,29 +287,29 @@ function App() {
                 <p style={{ fontSize: "14px", marginTop: "16px" }}>
                   Voting scale from&nbsp;
                   <input
-                    onChange={(e) =>
+                    key={scaleStart}
+                    defaultValue={scaleStart}
+                    onBlur={(e) => {
                       setScaleStart(
                         Math.max(-10, Math.min(10, parseInt(e.target.value)))
-                      )
-                    }
+                      );
+                    }}
                     type="number"
-                    value={scaleStart}
                     min="-10"
                     max="10"
-                    width="2"
                   />
                   &nbsp;to&nbsp;
                   <input
-                    onChange={(e) =>
+                    key={scaleEnd}
+                    defaultValue={scaleEnd}
+                    onBlur={(e) => {
                       setScaleEnd(
                         Math.max(-10, Math.min(10, parseInt(e.target.value)))
-                      )
-                    }
+                      );
+                    }}
                     type="number"
-                    value={scaleEnd}
                     min="-10"
                     max="10"
-                    width="2"
                   />
                 </p>
               </>
