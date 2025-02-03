@@ -229,7 +229,14 @@ function Widget() {
     ({ propertyName }) => {
       if (propertyName === "export-csv") {
         // Generate CSV data
-        const csvRows = ["Idea,Letter," + xAxisLabel + "," + yAxisLabel];
+        const csvRows = [
+          "Idea,Letter," +
+            xAxisLabel +
+            "," +
+            yAxisLabel +
+            "," +
+            `${xAxisLabel} x ${yAxisLabel}`,
+        ];
 
         for (let i = 0; i < ideas.length; i++) {
           const xRatings = [];
@@ -249,11 +256,13 @@ function Widget() {
           if (xRatings.length > 0 && yRatings.length > 0) {
             const avgX = average(xRatings);
             const avgY = average(yRatings);
+            const avgXY = avgX * avgY;
             const letter = numToLetter(i);
-            // Escape commas in the idea text
-            const escapedIdea = ideas[i].replace(/,/g, ";");
+            const escapedIdea = ideas[i].trim().replace(/[,\n\r]+/g, " ");
             csvRows.push(
-              `${escapedIdea},${letter},${avgX.toFixed(2)},${avgY.toFixed(2)}`
+              `${escapedIdea},${letter},${avgX.toFixed(2)},${avgY.toFixed(
+                2
+              )},${avgXY.toFixed(2)}`
             );
           }
         }
