@@ -45,10 +45,16 @@ interface UserResponse {
   ];
 }
 
+const CHART_SIZE = 540;
+const DOT_SIZE = 24;
+
 function Widget() {
   const responsesByUser = useSyncedMap("responsesByUser");
   const [xAxisLabel, setXAxisLabel] = useSyncedState("xAxisLabel", "Effort");
   const [yAxisLabel, setYAxisLabel] = useSyncedState("yAxisLabel", "Impact");
+  const [scaleStart, setScaleStart] = useSyncedState("scaleStart", 1);
+  const [scaleEnd, setScaleEnd] = useSyncedState("scaleEnd", 5);
+
   const [ideas, setIdeas] = useSyncedState("ideas", []);
   const [pluginStatus, setPluginStatus] = useSyncedState(
     "pluginStatus",
@@ -58,6 +64,16 @@ function Widget() {
     "selectedIdeaIndex",
     -1
   );
+
+  // Helper functions for chart positioning
+  const getX = (x: number): number => {
+    const step = CHART_SIZE / (scaleEnd - scaleStart);
+    return 20 + (x - scaleStart) * step;
+  };
+  const getY = (y: number): number => {
+    const step = CHART_SIZE / (scaleEnd - scaleStart);
+    return 40 + (scaleEnd - y) * step;
+  };
 
   useEffect(() => {
     figma.ui.on("message", (message) => {
@@ -84,11 +100,15 @@ function Widget() {
         setIdeas(msg.ideas);
         setXAxisLabel(msg.xAxis);
         setYAxisLabel(msg.yAxis);
+        setScaleStart(msg.scaleStart);
+        setScaleEnd(msg.scaleEnd);
         sendStateToUi({
           pluginStatus: "voting",
           ideas: msg.ideas,
           xAxis: msg.xAxis,
           yAxis: msg.yAxis,
+          scaleStart: msg.scaleStart,
+          scaleEnd: msg.scaleEnd,
         });
       }
 
@@ -119,9 +139,11 @@ function Widget() {
       JSON.stringify({
         msgType: "STATE",
         pluginStatus: optionalState?.pluginStatus || pluginStatus,
-        ideas: optionalState?.ideas || ideas,
-        xAxis: optionalState?.xAxis || xAxisLabel,
-        yAxis: optionalState?.yAxis || yAxisLabel,
+        ideas: optionalState?.ideas ?? ideas,
+        xAxis: optionalState?.xAxis ?? xAxisLabel,
+        yAxis: optionalState?.yAxis ?? yAxisLabel,
+        scaleStart: optionalState?.scaleStart ?? scaleStart,
+        scaleEnd: optionalState?.scaleEnd ?? scaleEnd,
         userId: figma.currentUser.id,
         userPhoto: figma.currentUser.photoUrl,
         responsesByUser: responsesByUser.get(figma.currentUser.id),
@@ -170,8 +192,6 @@ function Widget() {
   }
 
   const userImages = () => {
-    const DOT_SIZE = 24;
-
     const imgDotsData = [];
     responsesByUser.keys().forEach((key) => {
       const resp = responsesByUser.get(key) as UserResponse;
@@ -195,13 +215,8 @@ function Widget() {
     const imgDots = imgDotsData.map((dot) => (
       <Image
         key={dot.key}
-        x={
-          20 +
-          (dot.x - 1) * 135 -
-          DOT_SIZE / 2 +
-          dot.samePointProceedingCount * 12
-        }
-        y={40 + (5 - dot.y) * 135 - DOT_SIZE / 2}
+        x={getX(dot.x) - DOT_SIZE / 2 + dot.samePointProceedingCount * 12}
+        y={getY(dot.y) - DOT_SIZE / 2}
         width={DOT_SIZE}
         height={DOT_SIZE}
         cornerRadius={DOT_SIZE / 2}
@@ -358,7 +373,7 @@ function Widget() {
             lineHeight={20}
             fill={"#819494"}
           >
-            1
+            {scaleStart}
           </Text>
           <Text
             fontSize={16}
@@ -376,7 +391,7 @@ function Widget() {
             lineHeight={20}
             fill={"#819494"}
           >
-            5
+            {scaleEnd}
           </Text>
         </AutoLayout>
         <AutoLayout
@@ -394,7 +409,7 @@ function Widget() {
             lineHeight={20}
             fill={"#819494"}
           >
-            1
+            {scaleStart}
           </Text>
           <Text
             fontSize={16}
@@ -412,7 +427,7 @@ function Widget() {
             lineHeight={20}
             fill={"#819494"}
           >
-            5
+            {scaleEnd}
           </Text>
         </AutoLayout>
 
@@ -456,7 +471,6 @@ function Widget() {
             height={48}
             x={170}
             y={124}
-            // fill="#107680"
             fill="#5E57A4"
             cornerRadius={6}
             onClick={async () => {
@@ -511,8 +525,8 @@ function Widget() {
         {selectedIdeaIndex >= 0 && dataPlot[selectedIdeaDotIndex] && (
           <AutoLayout
             verticalAlignItems="center"
-            x={20 + (dataPlot[selectedIdeaDotIndex].avgX - 1) * 135 - 5}
-            y={40 + (5 - dataPlot[selectedIdeaDotIndex].avgY) * 135 - 5}
+            x={getX(dataPlot[selectedIdeaDotIndex].avgX) - 5}
+            y={getY(dataPlot[selectedIdeaDotIndex].avgY) - 5}
             spacing={6}
           >
             <Ellipse
@@ -531,8 +545,8 @@ function Widget() {
             <AutoLayout
               key={d.letter}
               verticalAlignItems="center"
-              x={20 + (d.avgX - 1) * 135 - 6}
-              y={40 + (5 - d.avgY) * 135 - 10}
+              x={getX(d.avgX) - 6}
+              y={getY(d.avgY) - 10}
               spacing={6}
             >
               <Ellipse y={4} width={12} height={12} fill="#108080" />

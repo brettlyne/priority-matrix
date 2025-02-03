@@ -18,7 +18,8 @@ button {
   border: none;
   cursor: pointer;
   &:hover {
-    background: linear-gradient(0deg, rgba(0, 0, 0, 0.13), rgba(0, 0, 0, 0.13)), #108080;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.13), rgba(0, 0, 0, 0.13)),
+      #108080;
   }
 }
 button.big {
@@ -103,6 +104,18 @@ button.disabled {
       border-radius: 6px;
       font-size: 16px;
       padding: 0 8px;
+    }
+    input[type="number"] {
+      width: 40px;
+      height: 32px;
+      -webkit-appearance: none;
+      appearance: none;
+      &::-webkit-inner-spin-button,
+      &::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        appearance: none;
+        margin: 0;
+      }
     }
   }
   .ideas-list {

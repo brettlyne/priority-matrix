@@ -14,6 +14,8 @@ type LikertPageProps = {
   yRating?: number;
   handleYRating: Function;
   handleXRating: Function;
+  scaleStart?: number;
+  scaleEnd?: number;
 };
 const LikertPage = ({
   idea,
@@ -24,6 +26,8 @@ const LikertPage = ({
   yRating,
   handleXRating,
   handleYRating,
+  scaleStart = 1,
+  scaleEnd = 5,
 }: LikertPageProps) => {
   return (
     <div className="likert-page">
@@ -37,42 +41,46 @@ const LikertPage = ({
       <div>
         <p className="likert-heading">{xAxis}</p>
         <div className="likert">
-          {[1, 2, 3, 4, 5].map((n) => (
-            <Fragment key={`impact${ideaIndex}-${n}-x`}>
-              <input
-                type="radio"
-                onChange={(e) => {
-                  handleXRating(parseInt(e.target.value));
-                }}
-                id={`impact${ideaIndex}-${n}-x`}
-                name={`impact${ideaIndex}-x`}
-                value={n}
-                checked={n === xRating}
-              />
-              <label htmlFor={`impact${ideaIndex}-${n}-x`}>{n}</label>
-            </Fragment>
-          ))}
+          {[...Array(scaleEnd - scaleStart + 1)]
+            .map((_, i) => scaleStart + i)
+            .map((n) => (
+              <Fragment key={`impact${ideaIndex}-${n}-x`}>
+                <input
+                  type="radio"
+                  onChange={(e) => {
+                    handleXRating(parseInt(e.target.value));
+                  }}
+                  id={`impact${ideaIndex}-${n}-x`}
+                  name={`impact${ideaIndex}-x`}
+                  value={n}
+                  checked={n === xRating}
+                />
+                <label htmlFor={`impact${ideaIndex}-${n}-x`}>{n}</label>
+              </Fragment>
+            ))}
         </div>
 
         <div style={{ height: "20px" }}></div>
 
         <p className="likert-heading">{yAxis}</p>
         <div className="likert">
-          {[1, 2, 3, 4, 5].map((n) => (
-            <Fragment key={`impact${ideaIndex}-${n}-y`}>
-              <input
-                type="radio"
-                onChange={(e) => {
-                  handleYRating(parseInt(e.target.value));
-                }}
-                id={`impact${ideaIndex}-${n}-y`}
-                name={`impact${ideaIndex}-y`}
-                value={n}
-                checked={n === yRating}
-              />
-              <label htmlFor={`impact${ideaIndex}-${n}-y`}>{n}</label>
-            </Fragment>
-          ))}
+          {[...Array(scaleEnd - scaleStart + 1)]
+            .map((_, i) => scaleStart + i)
+            .map((n) => (
+              <Fragment key={`impact${ideaIndex}-${n}-y`}>
+                <input
+                  type="radio"
+                  onChange={(e) => {
+                    handleYRating(parseInt(e.target.value));
+                  }}
+                  id={`impact${ideaIndex}-${n}-y`}
+                  name={`impact${ideaIndex}-y`}
+                  value={n}
+                  checked={n === yRating}
+                />
+                <label htmlFor={`impact${ideaIndex}-${n}-y`}>{n}</label>
+              </Fragment>
+            ))}
         </div>
       </div>
 
@@ -88,6 +96,9 @@ function App() {
   const [ideas, setIdeas] = React.useState<string[]>([]);
   const [xAxis, setXAxis] = React.useState("Effort");
   const [yAxis, setYAxis] = React.useState("Impact");
+  const [scaleStart, setScaleStart] = React.useState(1);
+  const [scaleEnd, setScaleEnd] = React.useState(5);
+
   const [responsesByUser, setResponsesByUser] = React.useState<object>({});
   const [currentPage, setCurrentPage] = React.useState(0);
 
@@ -111,6 +122,8 @@ function App() {
       setIdeas(message.ideas);
       setXAxis(message.xAxis);
       setYAxis(message.yAxis);
+      setScaleStart(message.scaleStart);
+      setScaleEnd(message.scaleEnd);
       setUserId(message.userId);
       setUserPhoto(message.userPhoto);
       setResponsesByUser(message.responsesByUser);
@@ -121,10 +134,16 @@ function App() {
   };
 
   const startVoting = () => {
+    if (scaleStart >= scaleEnd) {
+      alert("Scale start must be less than scale end.");
+      return;
+    }
     const message = {
       msgType: "startVoting",
       xAxis: xAxisRef.current?.value || "Effort",
       yAxis: yAxisRef.current?.value || "Impact",
+      scaleStart,
+      scaleEnd,
       ideas,
     };
     parent?.postMessage?.({ pluginMessage: JSON.stringify(message) }, "*");
@@ -244,7 +263,7 @@ function App() {
                   />
                 </div>
 
-                <div style={{ height: "40px" }}></div>
+                <div style={{ height: "24px" }}></div>
                 <button
                   className={`full-width ${
                     ideas.length === 0 ? "disabled" : ""
@@ -255,6 +274,34 @@ function App() {
                 </button>
                 <p style={{ fontSize: "14px", marginTop: "8px" }}>
                   Participants will see items in randomized order.
+                </p>
+                <p style={{ fontSize: "14px", marginTop: "16px" }}>
+                  Voting scale from&nbsp;
+                  <input
+                    onChange={(e) =>
+                      setScaleStart(
+                        Math.max(-10, Math.min(10, parseInt(e.target.value)))
+                      )
+                    }
+                    type="number"
+                    value={scaleStart}
+                    min="-10"
+                    max="10"
+                    width="2"
+                  />
+                  &nbsp;to&nbsp;
+                  <input
+                    onChange={(e) =>
+                      setScaleEnd(
+                        Math.max(-10, Math.min(10, parseInt(e.target.value)))
+                      )
+                    }
+                    type="number"
+                    value={scaleEnd}
+                    min="-10"
+                    max="10"
+                    width="2"
+                  />
                 </p>
               </>
             )}
@@ -311,6 +358,8 @@ function App() {
                 yAxis={yAxis}
                 xRating={response.xRating}
                 yRating={response.yRating}
+                scaleStart={scaleStart}
+                scaleEnd={scaleEnd}
                 handleXRating={(value: number) => {
                   addResponse({
                     responseIdx: i,
