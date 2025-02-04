@@ -268,17 +268,19 @@ function Widget() {
             }
           });
 
+          const escapedIdea = ideas[i].trim().replace(/[,\n\r]+/g, " ");
+          const letter = numToLetter(i);
           if (xRatings.length > 0 && yRatings.length > 0) {
             const avgX = average(xRatings);
             const avgY = average(yRatings);
             const avgXY = avgX * avgY;
-            const letter = numToLetter(i);
-            const escapedIdea = ideas[i].trim().replace(/[,\n\r]+/g, " ");
             csvRows.push(
               `${escapedIdea},${letter},${avgX.toFixed(2)},${avgY.toFixed(
                 2
               )},${avgXY.toFixed(2)}`
             );
+          } else {
+            csvRows.push(`${escapedIdea},${letter},,`);
           }
         }
 
@@ -293,7 +295,7 @@ function Widget() {
           );
           figma.notify("CSV data copied to clipboard!");
           // Give the UI operations some time to complete
-          setTimeout(resolve, 500);
+          setTimeout(resolve, 1000);
         });
       }
     }
