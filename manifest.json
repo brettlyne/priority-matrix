@@ -3,13 +3,11 @@
   "id": "1024916888280193111",
   "api": "1.0.0",
   "widgetApi": "1.0.0",
-  "editorType": [
-    "figjam"
-  ],
+  "editorType": ["figjam"],
   "containsWidget": true,
   "main": "dist/code.js",
   "ui": "dist/index.html",
-  "permissions": [
-    "currentuser"
-  ]
+  "permissions": ["currentuser"],
+  "networkAccess": { "allowedDomains": ["none"] },
+  "documentAccess": "dynamic-page"
 }
