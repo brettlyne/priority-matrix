@@ -192,7 +192,7 @@ function Widget() {
     }
   }
 
-  const userImages = () => {
+  const userImages = (zoom = 1) => {
     const imgDotsData = [];
     responsesByUser.keys().forEach((key) => {
       const resp = responsesByUser.get(key) as UserResponse;
@@ -216,11 +216,14 @@ function Widget() {
     const imgDots = imgDotsData.map((dot) => (
       <Image
         key={dot.key}
-        x={getX(dot.x) - DOT_SIZE / 2 + dot.samePointProceedingCount * 12}
-        y={getY(dot.y) - DOT_SIZE / 2}
-        width={DOT_SIZE}
-        height={DOT_SIZE}
-        cornerRadius={DOT_SIZE / 2}
+        x={
+          (getX(dot.x) - DOT_SIZE / 2 + dot.samePointProceedingCount * 12) *
+          zoom
+        }
+        y={(getY(dot.y) - DOT_SIZE / 2) * zoom}
+        width={DOT_SIZE * zoom}
+        height={DOT_SIZE * zoom}
+        cornerRadius={(DOT_SIZE / 2) * zoom}
         src={dot.userPhoto}
       />
     ));
@@ -233,14 +236,6 @@ function Widget() {
   );
 
   const propMenu = [];
-
-  if (pluginStatus === "revealed" && ideas.length > 0) {
-    propMenu.push({
-      itemType: "action",
-      propertyName: "view-csv",
-      tooltip: "View data as CSV",
-    });
-  }
 
   if (bigMode) {
     propMenu.push({
@@ -255,6 +250,14 @@ function Widget() {
       propertyName: "toggleBigMode",
       tooltip: "Big mode",
       icon: `<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><g clip-path="url(#a)"><path fill="#1E1E1E" d="M0 0h24v24H0z"/><rect width="11" height="11" x=".5" y="12.5" stroke="#fff" rx="1.5"/><path stroke="#fff" stroke-linecap="round" d="M13.5 23.5h6a4 4 0 0 0 4-4v-15a4 4 0 0 0-4-4h-15a4 4 0 0 0-4 4v6m19.9-7.1-7 7m7-7V7m0-3.6H17"/></g><defs><clipPath id="a"><path fill="#fff" d="M0 0h24v24H0z"/></clipPath></defs></svg>`,
+    });
+  }
+
+  if (pluginStatus === "revealed" && ideas.length > 0) {
+    propMenu.push({
+      itemType: "action",
+      propertyName: "view-csv",
+      tooltip: "View data as CSV",
     });
   }
 
@@ -316,25 +319,29 @@ function Widget() {
     }
   });
 
+  const zoom = bigMode ? 2 : 1;
+
   return (
     <AutoLayout width="hug-contents" height="hug-contents">
-      <Frame width={600} height={600}>
+      <Frame width={600 * zoom} height={600 * zoom}>
         <SVG
-          x={20}
-          src='<svg className="logo" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 260 28" width="260px" height="28px"><path fill="#385959" d="M12 0h236v28H12zM256 8h4v4h-4zM252 4h4v4h-4zM248 0h4v4h-4zM256 16h4v4h-4zM252 12h4v4h-4zM248 4h4v8h-4zM256 24h4v4h-4zM252 20h4v4h-4z" /><path fill="#fff" d="M28 16h-4v8h-4V4h12.1v4h-8v4h4v4Zm.1-8h4v8h-4V8ZM36.6 4h12v4h-8v4h4v4h4v8h-4v-8h-4v8h-4V4Zm8 4h4v4h-4V8ZM53.1 4h4v20h-4V4ZM61.7 4h4v20h-4V4Zm4 0h8v20h-8v-4h4V8h-4V4ZM78.3 4h12v4h-8v4h4v4h4v8h-4v-8h-4v8h-4V4Zm8 4h4v4h-4V8ZM94.8 4h4v20h-4V4ZM103.3 4h12v4h-4v16h-4V8h-4V4ZM119.9 4h3.9v8h4V4h4v12h-4v8h-4v-8h-4V4ZM145 4h4v4h4v4h4V8h4V4h4v20h-4V12h-4v4h-4v-4h-4v12h-4V4ZM169.5 4h12v20h-4V8h-4v16h-4V4Zm4 8h4v4h-4v-4ZM186 4h12v4h-4v16h-3.9V8h-4V4ZM202.7 4h12v4h-8v4h4v4h4v8h-4v-8h-4v8h-4V4Zm8 4h4v4h-4V8ZM219.2 4h4v20h-4V4ZM227.8 4h4v8h4V4h4v8h-4v4h4v8h-4v-8h-4v8h-4v-8h4v-4h-4V4Z" /><path fill="#385959" d="M4 0H0v4h4zM8 4H4v4h4zM12 8H8v4h4zM4 8H0v4h4zM8 12H4v4h4zM12 16H8v9h4zM4 16H0v4h4zM8 20H4v4h4z" /><path fill="#385959" d="M12 24H8v4h4z" /></svg>'
+          width={260 * zoom}
+          height={28 * zoom}
+          x={20 * zoom}
+          src='<svg className="logo" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 260 28"><path fill="#385959" d="M12 0h236v28H12zM256 8h4v4h-4zM252 4h4v4h-4zM248 0h4v4h-4zM256 16h4v4h-4zM252 12h4v4h-4zM248 4h4v8h-4zM256 24h4v4h-4zM252 20h4v4h-4z" /><path fill="#fff" d="M28 16h-4v8h-4V4h12.1v4h-8v4h4v4Zm.1-8h4v8h-4V8ZM36.6 4h12v4h-8v4h4v4h4v8h-4v-8h-4v8h-4V4Zm8 4h4v4h-4V8ZM53.1 4h4v20h-4V4ZM61.7 4h4v20h-4V4Zm4 0h8v20h-8v-4h4V8h-4V4ZM78.3 4h12v4h-8v4h4v4h4v8h-4v-8h-4v8h-4V4Zm8 4h4v4h-4V8ZM94.8 4h4v20h-4V4ZM103.3 4h12v4h-4v16h-4V8h-4V4ZM119.9 4h3.9v8h4V4h4v12h-4v8h-4v-8h-4V4ZM145 4h4v4h4v4h4V8h4V4h4v20h-4V12h-4v4h-4v-4h-4v12h-4V4ZM169.5 4h12v20h-4V8h-4v16h-4V4Zm4 8h4v4h-4v-4ZM186 4h12v4h-4v16h-3.9V8h-4V4ZM202.7 4h12v4h-8v4h4v4h4v8h-4v-8h-4v8h-4V4Zm8 4h4v4h-4V8ZM219.2 4h4v20h-4V4ZM227.8 4h4v8h4V4h4v8h-4v4h4v8h-4v-8h-4v8h-4v-8h4v-4h-4V4Z" /><path fill="#385959" d="M4 0H0v4h4zM8 4H4v4h4zM12 8H8v4h4zM4 8H0v4h4zM8 12H4v4h4zM12 16H8v9h4zM4 16H0v4h4zM8 20H4v4h4z" /><path fill="#385959" d="M12 24H8v4h4z" /></svg>'
         />
         {pluginStatus === "revealed" && (
           <AutoLayout
             direction="horizontal"
             horizontalAlignItems="center"
             verticalAlignItems="center"
-            width={200}
-            height={28}
-            x={360}
-            y={0}
+            width={200 * zoom}
+            height={28 * zoom}
+            x={360 * zoom}
+            y={0 * zoom}
             // fill="#107680"
             fill="#5E57A4"
-            cornerRadius={4}
+            cornerRadius={4 * zoom}
             onClick={async () => {
               await new Promise((resolve) => {
                 showUI();
@@ -342,10 +349,10 @@ function Widget() {
             }}
           >
             <Text
-              fontSize={14}
+              fontSize={14 * zoom}
               fontWeight={700}
               width="hug-contents"
-              lineHeight={20}
+              lineHeight={20 * zoom}
               fill={"#ffffff"}
               onClick={async () => {
                 await new Promise((resolve) => {
@@ -360,10 +367,10 @@ function Widget() {
 
         {/* CHART BACKGROUND */}
         <SVG
-          x={20}
-          y={40}
-          width={540}
-          height={540}
+          x={20 * zoom}
+          y={40 * zoom}
+          width={540 * zoom}
+          height={540 * zoom}
           src={`
 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 541 540">
 <g clipPath="url(#a)">
@@ -382,66 +389,72 @@ function Widget() {
         />
 
         {/* AXES LABELS */}
-        <AutoLayout x={20} y={580} width={540} height={20} spacing="auto">
+        <AutoLayout
+          x={20 * zoom}
+          y={580 * zoom}
+          width={540 * zoom}
+          height={20 * zoom}
+          spacing="auto"
+        >
           <Text
-            fontSize={16}
+            fontSize={16 * zoom}
             fontWeight={500}
             width="hug-contents"
-            lineHeight={20}
+            lineHeight={20 * zoom}
             fill={"#819494"}
           >
             {scaleStart}
           </Text>
           <Text
-            fontSize={16}
+            fontSize={16 * zoom}
             fontWeight={500}
             width="hug-contents"
-            lineHeight={20}
+            lineHeight={20 * zoom}
             fill={"#819494"}
           >
             {xAxisLabel}
           </Text>
           <Text
-            fontSize={16}
+            fontSize={16 * zoom}
             fontWeight={500}
             width="hug-contents"
-            lineHeight={20}
+            lineHeight={20 * zoom}
             fill={"#819494"}
           >
             {scaleEnd}
           </Text>
         </AutoLayout>
         <AutoLayout
-          x={0}
-          y={580}
-          width={540}
-          height={20}
+          x={0 * zoom}
+          y={580 * zoom}
+          width={540 * zoom}
+          height={20 * zoom}
           spacing="auto"
           rotation={90}
         >
           <Text
-            fontSize={16}
+            fontSize={16 * zoom}
             fontWeight={500}
             width="hug-contents"
-            lineHeight={20}
+            lineHeight={20 * zoom}
             fill={"#819494"}
           >
             {scaleStart}
           </Text>
           <Text
-            fontSize={16}
+            fontSize={16 * zoom}
             fontWeight={500}
             width="hug-contents"
-            lineHeight={20}
+            lineHeight={20 * zoom}
             fill={"#819494"}
           >
             {yAxisLabel}
           </Text>
           <Text
-            fontSize={16}
+            fontSize={16 * zoom}
             fontWeight={500}
             width="hug-contents"
-            lineHeight={20}
+            lineHeight={20 * zoom}
             fill={"#819494"}
           >
             {scaleEnd}
@@ -454,13 +467,13 @@ function Widget() {
             direction="horizontal"
             horizontalAlignItems="center"
             verticalAlignItems="center"
-            width={244}
-            height={48}
-            x={170}
-            y={124}
+            width={244 * zoom}
+            height={48 * zoom}
+            x={170 * zoom}
+            y={124 * zoom}
             // fill="#107680"
             fill="#5E57A4"
-            cornerRadius={6}
+            cornerRadius={6 * zoom}
             onClick={async () => {
               await new Promise((resolve) => {
                 showUI();
@@ -468,10 +481,10 @@ function Widget() {
             }}
           >
             <Text
-              fontSize={16}
+              fontSize={16 * zoom}
               fontWeight={500}
               width="hug-contents"
-              lineHeight={20}
+              lineHeight={20 * zoom}
               fill={"#ffffff"}
             >
               Setup new prioritization
@@ -484,12 +497,12 @@ function Widget() {
             direction="horizontal"
             horizontalAlignItems="center"
             verticalAlignItems="center"
-            width={244}
-            height={48}
-            x={170}
-            y={124}
+            width={244 * zoom}
+            height={48 * zoom}
+            x={170 * zoom}
+            y={124 * zoom}
             fill="#5E57A4"
-            cornerRadius={6}
+            cornerRadius={6 * zoom}
             onClick={async () => {
               await new Promise((resolve) => {
                 showUI();
@@ -497,10 +510,10 @@ function Widget() {
             }}
           >
             <Text
-              fontSize={16}
+              fontSize={16 * zoom}
               fontWeight={500}
               width="hug-contents"
-              lineHeight={20}
+              lineHeight={20 * zoom}
               fill={"#ffffff"}
             >
               Add your ratings
@@ -513,23 +526,23 @@ function Widget() {
             direction="horizontal"
             horizontalAlignItems="center"
             verticalAlignItems="center"
-            width={244}
-            height={48}
-            x={170}
-            y={205}
+            width={244 * zoom}
+            height={48 * zoom}
+            x={170 * zoom}
+            y={205 * zoom}
             // fill="#F3FFFF"
             // stroke="#A4C5C5"
             fill="#EFEDFF"
             stroke="#5E57A4"
-            cornerRadius={6}
+            cornerRadius={6 * zoom}
             onClick={() => {
               setPluginStatus("revealed");
             }}
           >
             <Text
-              fontSize={16}
+              fontSize={16 * zoom}
               width="hug-contents"
-              lineHeight={20}
+              lineHeight={20 * zoom}
               fill={"#332D73"}
             >
               Reveal results
@@ -538,18 +551,18 @@ function Widget() {
         )}
 
         {/* photo dots when an idea is selected */}
-        {selectedIdeaIndex >= 0 && userImages()}
+        {selectedIdeaIndex >= 0 && userImages(zoom)}
         {selectedIdeaIndex >= 0 && dataPlot[selectedIdeaDotIndex] && (
           <AutoLayout
             verticalAlignItems="center"
-            x={getX(dataPlot[selectedIdeaDotIndex].avgX) - 5}
-            y={getY(dataPlot[selectedIdeaDotIndex].avgY) - 5}
-            spacing={6}
+            x={(getX(dataPlot[selectedIdeaDotIndex].avgX) - 5) * zoom}
+            y={(getY(dataPlot[selectedIdeaDotIndex].avgY) - 5) * zoom}
+            spacing={6 * zoom}
           >
             <Ellipse
-              y={4}
-              width={10}
-              height={10}
+              y={4 * zoom}
+              width={10 * zoom}
+              height={10 * zoom}
               fill="#108080"
               stroke="#fff"
             />
@@ -562,15 +575,20 @@ function Widget() {
             <AutoLayout
               key={d.letter}
               verticalAlignItems="center"
-              x={getX(d.avgX) - 6}
-              y={getY(d.avgY) - 10}
-              spacing={6}
+              x={(getX(d.avgX) - 6) * zoom}
+              y={(getY(d.avgY) - 10) * zoom}
+              spacing={6 * zoom}
             >
-              <Ellipse y={4} width={12} height={12} fill="#108080" />
+              <Ellipse
+                y={4 * zoom}
+                width={12 * zoom}
+                height={12 * zoom}
+                fill="#108080"
+              />
               <Text
-                fontSize={16}
+                fontSize={16 * zoom}
                 width="hug-contents"
-                lineHeight={20}
+                lineHeight={20 * zoom}
                 fill="#108080"
                 fontWeight={500}
               >
@@ -586,7 +604,7 @@ function Widget() {
           spacing={0}
           width={"hug-contents"}
           height={"hug-contents"}
-          padding={{ top: 60, left: 0 }}
+          padding={{ top: 60 * zoom, left: 0 }}
         >
           {ideas.map((idea, i) => {
             const selected = i === selectedIdeaIndex;
@@ -595,28 +613,33 @@ function Widget() {
                 key={i}
                 height={"hug-contents"}
                 width={"hug-contents"}
-                spacing={8}
+                spacing={8 * zoom}
                 fill={selected ? "#107680" : null}
-                padding={{ left: 12, right: 10, top: 5, bottom: 6 }}
-                cornerRadius={6}
+                padding={{
+                  left: 12 * zoom,
+                  right: 10 * zoom,
+                  top: 5 * zoom,
+                  bottom: 6 * zoom,
+                }}
+                cornerRadius={6 * zoom}
                 onClick={() => {
                   setSelectedIdeaIndex(selected ? -1 : i);
                 }}
               >
                 <Text
-                  fontSize={16}
-                  width={12}
+                  fontSize={16 * zoom}
+                  width={12 * zoom}
                   horizontalAlignText="right"
-                  lineHeight={20}
+                  lineHeight={20 * zoom}
                   fill={selected ? "#fff" : "#108080"}
                   fontWeight={500}
                 >
                   {numToLetter(i)}
                 </Text>
                 <Text
-                  fontSize={16}
-                  width={320}
-                  lineHeight={20}
+                  fontSize={16 * zoom}
+                  width={320 * zoom}
+                  lineHeight={20 * zoom}
                   fill={selected ? "#fff" : "#272B2B"}
                   fontWeight={400}
                 >
