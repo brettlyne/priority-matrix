@@ -60,6 +60,7 @@ function Widget() {
     "pluginStatus",
     "setup"
   );
+  const [bigMode, setBigMode] = useSyncedState("bigMode", false);
   const [selectedIdeaIndex, setSelectedIdeaIndex] = useSyncedState(
     "selectedIdeaIndex",
     -1
@@ -231,72 +232,89 @@ function Widget() {
     data.ideaIndices.includes(selectedIdeaIndex)
   );
 
-  usePropertyMenu(
-    pluginStatus === "revealed" && ideas.length > 0
-      ? [
-          {
-            itemType: "action",
-            propertyName: "view-csv",
-            tooltip: "View data as CSV",
-          },
-        ]
-      : [],
-    ({ propertyName }) => {
-      if (propertyName === "view-csv") {
-        // Generate CSV data
-        const csvRows = [
-          "Idea,Letter," +
-            xAxisLabel +
-            "," +
-            yAxisLabel +
-            "," +
-            `${xAxisLabel} x ${yAxisLabel}`,
-        ];
+  const propMenu = [];
 
-        for (let i = 0; i < ideas.length; i++) {
-          const xRatings = [];
-          const yRatings = [];
+  if (pluginStatus === "revealed" && ideas.length > 0) {
+    propMenu.push({
+      itemType: "action",
+      propertyName: "view-csv",
+      tooltip: "View data as CSV",
+    });
+  }
 
-          responsesByUser.keys().forEach((key) => {
-            const resp = responsesByUser.get(key) as UserResponse;
-            const match = resp.responses.find(
-              (response) => response.questionIdx === i
-            );
-            if (match.xRating !== null && match.yRating !== null) {
-              xRatings.push(match.xRating);
-              yRatings.push(match.yRating);
-            }
-          });
+  if (bigMode) {
+    propMenu.push({
+      itemType: "action",
+      propertyName: "toggleBigMode",
+      tooltip: "Small mode",
+      icon: `<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><g clip-path="url(#a)"><path fill="#1E1E1E" d="M0 0h24v24H0z"/><rect width="11" height="11" x=".5" y="12.5" stroke="#fff" rx="1.5"/><path stroke="#fff" stroke-linecap="round" d="M13.5 23.5h8a2 2 0 0 0 2-2v-19a2 2 0 0 0-2-2h-19a2 2 0 0 0-2 2v8m13 0 7-7m-7 7V6.9m0 3.6h3.4"/></g><defs><clipPath id="a"><path fill="#fff" d="M0 0h24v24H0z"/></clipPath></defs></svg>`,
+    });
+  } else {
+    propMenu.push({
+      itemType: "action",
+      propertyName: "toggleBigMode",
+      tooltip: "Big mode",
+      icon: `<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><g clip-path="url(#a)"><path fill="#1E1E1E" d="M0 0h24v24H0z"/><rect width="11" height="11" x=".5" y="12.5" stroke="#fff" rx="1.5"/><path stroke="#fff" stroke-linecap="round" d="M13.5 23.5h6a4 4 0 0 0 4-4v-15a4 4 0 0 0-4-4h-15a4 4 0 0 0-4 4v6m19.9-7.1-7 7m7-7V7m0-3.6H17"/></g><defs><clipPath id="a"><path fill="#fff" d="M0 0h24v24H0z"/></clipPath></defs></svg>`,
+    });
+  }
 
-          const escapedIdea = ideas[i].trim().replace(/[,\n\r]+/g, " ");
-          const letter = numToLetter(i);
-          if (xRatings.length > 0 && yRatings.length > 0) {
-            const avgX = average(xRatings);
-            const avgY = average(yRatings);
-            const avgXY = avgX * avgY;
-            csvRows.push(
-              `${escapedIdea},${letter},${avgX.toFixed(2)},${avgY.toFixed(
-                2
-              )},${avgXY.toFixed(2)}`
-            );
-          } else {
-            csvRows.push(`${escapedIdea},${letter},,`);
-          }
-        }
+  usePropertyMenu(propMenu, ({ propertyName }) => {
+    if (propertyName === "view-csv") {
+      // Generate CSV data
+      const csvRows = [
+        "Idea,Letter," +
+          xAxisLabel +
+          "," +
+          yAxisLabel +
+          "," +
+          `${xAxisLabel} x ${yAxisLabel}`,
+      ];
 
-        // Copy to clipboard
-        return new Promise((resolve) => {
-          figma.showUI(__html__, { visible: true, height: 500, width: 600 });
-          figma.ui.postMessage(
-            JSON.stringify({
-              msgType: "OPEN_AS_CSV",
-              csvData: csvRows.join("\n"),
-            })
+      for (let i = 0; i < ideas.length; i++) {
+        const xRatings = [];
+        const yRatings = [];
+
+        responsesByUser.keys().forEach((key) => {
+          const resp = responsesByUser.get(key) as UserResponse;
+          const match = resp.responses.find(
+            (response) => response.questionIdx === i
           );
+          if (match.xRating !== null && match.yRating !== null) {
+            xRatings.push(match.xRating);
+            yRatings.push(match.yRating);
+          }
         });
+
+        const escapedIdea = ideas[i].trim().replace(/[,\n\r]+/g, " ");
+        const letter = numToLetter(i);
+        if (xRatings.length > 0 && yRatings.length > 0) {
+          const avgX = average(xRatings);
+          const avgY = average(yRatings);
+          const avgXY = avgX * avgY;
+          csvRows.push(
+            `${escapedIdea},${letter},${avgX.toFixed(2)},${avgY.toFixed(
+              2
+            )},${avgXY.toFixed(2)}`
+          );
+        } else {
+          csvRows.push(`${escapedIdea},${letter},,`);
+        }
       }
+
+      // Copy to clipboard
+      return new Promise((resolve) => {
+        figma.showUI(__html__, { visible: true, height: 500, width: 600 });
+        figma.ui.postMessage(
+          JSON.stringify({
+            msgType: "OPEN_AS_CSV",
+            csvData: csvRows.join("\n"),
+          })
+        );
+      });
+    } else if (propertyName === "toggleBigMode") {
+      setBigMode(!bigMode);
     }
-  );
+  });
 
   return (
     <AutoLayout width="hug-contents" height="hug-contents">
