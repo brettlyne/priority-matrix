@@ -1,5 +1,5 @@
-import React, { Fragment, useEffect } from "react";
-import { Logo, IconX, writeTextToClipboard } from "./util";
+import React, { Fragment } from "react";
+import { Logo, IconX } from "./util";
 
 import Pagination from "./Pagination";
 
@@ -91,6 +91,9 @@ const LikertPage = ({
 
 function App() {
   const [status, setStatus] = React.useState("setup");
+  const [CSVData, setCSVData] = React.useState("");
+  const textArea = React.useRef<HTMLTextAreaElement>(null);
+  const [delimiter, setDelimiter] = React.useState("comma");
   const [userId, setUserId] = React.useState(null);
   const [userPhoto, setUserPhoto] = React.useState(null);
   const [ideas, setIdeas] = React.useState<string[]>([]);
@@ -128,8 +131,9 @@ function App() {
       setUserPhoto(message.userPhoto);
       setResponsesByUser(message.responsesByUser);
     }
-    if (message.msgType === "COPY_TO_CLIPBOARD") {
-      writeTextToClipboard(message.text);
+    if (message.msgType === "OPEN_AS_CSV") {
+      setStatus("csv");
+      setCSVData(message.csvData);
     }
   };
 
@@ -220,6 +224,92 @@ function App() {
       true
     );
 
+  if (status === "csv") {
+    let data = CSVData;
+    if (delimiter === "tab") {
+      data = data
+        .split("\n")
+        .map((line) => line.split(",").join("\t"))
+        .join("\n");
+    }
+
+    return (
+      <div className="App" style={{ padding: "4px 12px" }}>
+        <div
+          style={{
+            margin: "10px 0",
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+          }}
+        >
+          <span>Delimiter:</span>
+          <label style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+            <input
+              type="radio"
+              name="delimiter"
+              value="comma"
+              checked={delimiter === "comma"}
+              onChange={(e) => setDelimiter(e.target.value)}
+            />
+            commas
+          </label>
+          <label style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+            <input
+              type="radio"
+              name="delimiter"
+              value="tab"
+              checked={delimiter === "tab"}
+              onChange={(e) => setDelimiter(e.target.value)}
+            />
+            tabs (for sheets, excel, etc)
+          </label>
+        </div>
+        <textarea
+          style={{
+            width: "100%",
+            height: "calc(100% - 120px)",
+            marginBottom: "12px",
+          }}
+          ref={textArea}
+          readOnly
+          value={data}
+        />
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: "12px",
+          }}
+        >
+          <button
+            className="secondary"
+            onClick={() => {
+              textArea.current?.focus();
+              textArea.current?.select();
+              document.execCommand("copy");
+            }}
+          >
+            Copy to clipboard
+          </button>
+          <button
+            onClick={() => {
+              parent.postMessage(
+                {
+                  pluginMessage: JSON.stringify({
+                    msgType: "closePlugin",
+                  }),
+                },
+                "*"
+              );
+            }}
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="App">
       {status === "setup" && (
