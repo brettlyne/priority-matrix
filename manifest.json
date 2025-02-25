@@ -8,6 +8,6 @@
   "main": "dist/code.js",
   "ui": "dist/index.html",
   "permissions": ["currentuser"],
-  "networkAccess": { "allowedDomains": ["none"] },
+  "networkAccess": { "allowedDomains": ["https://*.figma.com"] },
   "documentAccess": "dynamic-page"
 }
